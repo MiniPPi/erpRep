@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.empVcs.dao.EmpVcsDao">
+
+
+	<!-- 휴가신청 목록 리스트 조회 -->
+	<select id="empVcsList" resultType="kr.happyjob.study.empVcs.model.VacaSearchModel">
+		select vaca.vaca_no
+			   ,vaca.loginID
+			   ,user.name
+			   ,vaca.vaca_req_date
+			   ,vaca.vaca_sdate
+			   ,vaca.vaca_edate
+			   ,vaca.vaca_tel
+			   ,vaca.appro_bos
+			   ,vaca.appro_yn
+			   ,vaca.vaca_rej
+			from tb_vaca_req vaca
+				 inner join tb_userinfo user on user.loginID = vaca.loginID 
+			<where>
+			<if test="(vaca_req_sdate != null) and (!vaca_req_sdate.equals(''))">
+				and STR_TO_DATE(vaca.vaca_req_date,'%Y-%m-%d') >= STR_TO_DATE(#{vaca_req_sdate},'%Y-%m-%d')
+			</if>
+			<if test="(vaca_req_edate != null) and (!vaca_req_edate.equals(''))">
+				and STR_TO_DATE(#{vaca_req_edate},'%Y-%m-%d') >= STR_TO_DATE(vaca.vaca_req_date,'%Y-%m-%d')
+																	   
+			</if>
+			
+			<if test="(loginID != null) and (!loginID.equals(''))">
+				and vaca.loginID Like CONCAT('%',replace(#{loginID},' ','') , '%')
+			</if>
+			</where>
+			order by vaca.vaca_no desc
+			LIMIT #{pageindex}, #{pageSize} 
+	
+	</select>
+	
+	<select id="countEmpVcsList" resultType="int">
+		select count(*)
+			from tb_vaca_req vaca
+				inner join tb_userinfo user on user.loginID = vaca.loginID 
+			<where>
+			<if test="(vaca_req_sdate != null) and (!vaca_req_sdate.equals(''))">
+				and STR_TO_DATE(vaca.vaca_req_date,'%Y-%m-%d') >= STR_TO_DATE(#{vaca_req_sdate},'%Y-%m-%d')
+			</if>
+			<if test="(vaca_req_edate != null) and (!vaca_req_edate.equals(''))">
+				and STR_TO_DATE(#{vaca_req_edate},'%Y-%m-%d') >= STR_TO_DATE(vaca.vaca_req_date,'%Y-%m-%d')
+																	   
+			</if>
+			
+			<if test="(loginID != null) and (!loginID.equals(''))">
+				and vaca.loginID Like CONCAT('%',replace(#{loginID},' ',''), '%')
+			</if>
+			</where>
+	</select>
+	
+
+
+	<!-- 반려사유 상세조회 -->
+	<select id="rejDetail" resultType="String">
+		select vaca_rej from tb_vaca_req where vaca_no = #{vaca_no}
+	</select>
+	
+	<!-- 사번 유무 체크 -->
+	<select id="loginIDChk" resultType="Integer">
+		select count(loginID) from tb_userinfo where loginID = replace(#{IDVal},' ','') and emp_work_yn = 'Y'
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.accEps.dao.AccEpsDao">
+
+	<!--  목록 조회 -->
+	<select id="expenseSearchList" resultType="kr.happyjob.study.accEps.model.AccEpsModel">
+		/*kr.happyjob.study.accEps.dao.AccEpsDao.expenseSearchList*/
+     select  
+       er.loginID
+      ,ui.name 
+      ,er.expen_report_no
+      ,format(cast(er.expen_price as decimal),0)as expen_price
+      ,er.expen_inf
+      ,DATE_FORMAT(er.expen_date,'%Y-%m-%d') as expen_date
+      ,CONCAT(
+      					DATE_FORMAT(er.expen_date,'%Y'),'년'
+      					,DATE_FORMAT(er.expen_date,'%m'),'월'
+      					,DATE_FORMAT(er.expen_date,'%d'),'일'
+      					
+      				) as expen_date
+      ,case when ap.appro_yn = 'Y' then '결재'
+              when ap.appro_yn = 'N' then '반려'
+       end as appro_yn
+      ,ap.appro_no
+      ,ui2.name as appro_bos
+      ,er.acnt_sbject_cd
+      ,er.acnt_dt_sbject_cd
+      ,ac.acnt_sbject_name
+      ,ds.acnt_dt_sbjct_name
+      ,ap.appro_date
+      ,DATE_FORMAT(ap.appro_req_date,'%Y-%m-%d') as appro_req_date
+      ,CONCAT(
+      					DATE_FORMAT(ap.appro_req_date,'%Y'),'년'
+      					,DATE_FORMAT(ap.appro_req_date,'%m'),'월'
+      					,DATE_FORMAT(ap.appro_req_date,'%d'),'일'
+      					
+      				) as appro_req_date
+      ,er.file_no
+      ,fi.file_name
+      ,fi.logic_path
+      ,fi.physic_path
+      ,fi.file_size
+      ,fi.exten
+      ,ac.acnt_sbject_name
+	  ,ds.acnt_dt_sbjct_name
+ from tb_expen_report er
+         inner join tb_userinfo ui on ui.loginID = er.loginID
+        left outer join tb_file fi on fi.file_no = er.file_no
+        inner join tb_acnt_sbject ac on ac.acnt_sbject_cd = er.acnt_sbject_cd 
+        inner join tb_dt_sbject ds on ds.acnt_dt_sbject_cd = er.acnt_dt_sbject_cd
+        left outer join tb_appro ap on  ap.appro_no = er.appro_no
+        left outer join tb_userinfo ui2 on ui2.loginID = ap.appro_bos
+ <where>
+ 
+	<if test="(from != null) and (!from.equals(''))  ">
+	    and ap.appro_req_date <![CDATA[>=]]>  STR_TO_DATE(#{from}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(to != null) and (!to.equals(''))">
+	     and ap.appro_req_date <![CDATA[<=]]> STR_TO_DATE(#{to}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(appro_yn != null) and (!appro_yn.equals(''))">
+		    and ap.appro_yn = #{appro_yn}
+	</if>
+	
+	<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+		    and er.acnt_sbject_cd = #{acnt_sbject_cd}
+	</if>
+	
+	<if test="(acnt_dt_sbject_cd != null) and (!acnt_dt_sbject_cd.equals(''))">
+		    and er.acnt_dt_sbject_cd = #{acnt_dt_sbject_cd}
+	</if>
+	
+	<if test="(sname != null) and (!sname.equals(''))">
+			and ui.name like  concat('%',#{sname},'%')
+	</if>	
+	
+	</where>		
+	ORDER BY ap.appro_no DESC
+	LIMIT #{pageIndex}, #{pageSize}
+		
+	</select>
+	
+	<!-- 목록 총 갯수 조회 -->
+	<select id="countList" resultType="int">
+		/*kr.happyjob.study.accEps.dao.AccEpsDao.countList*/
+		select count(*)
+ from tb_expen_report er
+          inner join tb_userinfo ui on ui.loginID = er.loginID
+          left outer join tb_file fi on fi.file_no = er.file_no
+          inner join tb_acnt_sbject ac on ac.acnt_sbject_cd = er.acnt_sbject_cd 
+          inner join tb_dt_sbject ds on ds.acnt_dt_sbject_cd = er.acnt_dt_sbject_cd
+          inner join tb_appro ap on ap.appro_no = er.appro_no
+          left outer join tb_userinfo ui2 on ui2.loginID = ap.appro_bos
+ <where>
+ 
+	<if test="(from != null) and (!from.equals(''))  ">
+	     and ap.appro_req_date <![CDATA[>=]]>  STR_TO_DATE(#{from}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(to != null) and (!to.equals(''))">
+	     and ap.appro_req_date <![CDATA[<=]]> STR_TO_DATE(#{to}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(appro_yn != null) and (!appro_yn.equals(''))">
+		    and ap.appro_yn = #{appro_yn}
+	</if>
+	
+	<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+		    and er.acnt_sbject_cd = #{acnt_sbject_cd}
+	</if>
+	
+	<if test="(acnt_dt_sbject_cd != null) and (!acnt_dt_sbject_cd.equals(''))">
+		    and er.acnt_dt_sbject_cd = #{acnt_dt_sbject_cd}
+	</if>
+	
+	<if test="(sname != null) and (!sname.equals(''))">
+			and ui.name like  concat('%',#{sname},'%')
+	</if>	
+	
+	</where>		
+	</select>
+	
+	<select id="listSelectOneEps" resultType="kr.happyjob.study.accEps.model.AccEpsModel">
+	 select er.loginID
+		      ,ui.name
+		      ,format(cast(er.expen_price as decimal),0)as expen_price
+		      ,er.expen_inf
+		      ,er.expen_date
+		      ,er.expen_shop
+		      ,er.expen_report_no
+		      ,ap.appro_no
+		      ,ap.appro_yn
+		      ,ap.appro_type_cd
+		      ,ap.dept_cd
+		      ,er.acnt_sbject_cd
+		      ,er.acnt_dt_sbject_cd
+		      ,ac.acnt_sbject_name
+		      ,ds.acnt_dt_sbjct_name
+		      ,ap.appro_req_date
+		      ,er.file_no
+		      ,fi.file_name
+		      ,fi.logic_path
+		      ,fi.physic_path
+		      ,fi.file_size
+		      ,fi.exten
+		      ,ap.appro_no
+		      ,ap.appro_rej_reason
+	 from tb_expen_report er
+	 inner join tb_userinfo ui on ui.loginID = er.loginID
+	 left outer join tb_file fi on fi.file_no = er.file_no
+	 inner join tb_acnt_sbject ac on ac.acnt_sbject_cd = er.acnt_sbject_cd 
+	 inner join tb_dt_sbject ds on ds.acnt_dt_sbject_cd = er.acnt_dt_sbject_cd
+	 inner join tb_appro ap on ap.appro_no = er.appro_no
+	 where er.appro_no = #{appro_no} 
+	             
+	</select>
+	
+	<update id="listUpdateFileApproEps">
+	      update tb_appro ap
+	      inner join tb_userinfo ui 
+	      on ap.loginID = ui.loginID
+	         set  ap.appro_yn =  #{appro_yn} 
+	         ,ap.appro_date =  now()
+	         ,ap.appro_bos = #{loginID}
+	         ,ap.appro_rej_reason = #{appro_rej_reason}
+	     where  appro_no =  #{appro_no}    
+	     
+	  
+	</update>
+	<insert id="listUpdateFileBudEps">
+	
+	<selectKey resultType="int" keyProperty="no" order="BEFORE">
+            select ifnull(max(budget_no),0) + 1 from tb_budget
+        </selectKey>
+	      
+	     insert into tb_budget
+						(
+						  budget_no
+						  , acnt_sbject_cd
+						  , acnt_dt_sbject_cd
+						  , expen_report_no
+						  
+						)
+						values
+						(
+						  #{no},
+						  #{acnt_sbject_cd},
+						  #{acnt_dt_sbject_cd},
+						  #{expen_report_no}
+						  
+						)   
+	     
+	  
+	</insert>
+	
+	
+	
+	
+</mapper>

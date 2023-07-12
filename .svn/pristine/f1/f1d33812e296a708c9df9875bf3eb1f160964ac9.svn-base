@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.accAcs.dao.accAcsDao">
+
+	<!--  목록 조회 -->
+	<select id="accountSearchList" resultType="kr.happyjob.study.accAcs.model.accAcsModel">
+		select ll.budget_no
+		      ,ll.acnt_sbject_cd
+		      ,ll.acnt_dt_sbject_cd
+		      ,ll.expen_report_no
+		      ,ll.dlv_no
+		      ,ll.order_no
+		      ,ll.no
+		      ,ll.pdate
+		      ,ll.loginID
+		      ,ui.name
+		      ,case when asb.acnt_sbjct_inout = '1' then '수입'
+		            when asb.acnt_sbjct_inout = '2' then '지출'
+		            else ''
+		       end as acnt_sbjct_inout 
+		      ,ds.acnt_dt_sbjct_name as acnt_dt_sbjct_name
+		      ,ll.client
+		      ,case when asb.acnt_sbjct_inout = '1' then 0
+		            when asb.acnt_sbjct_inout = '2' then ll.amt
+		            else 0
+		       end as outamt 
+		      ,case when asb.acnt_sbjct_inout = '1' then ll.amt
+		            when asb.acnt_sbjct_inout = '2' then 0
+		            else 0
+		       end as inamt 
+		  from (
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,od.order_no as no
+		                           ,od.order_date as pdate 
+		                           ,od.loginID 
+		                           ,od.order_tot_price as amt
+		                           ,cl.clnt_name as client
+		                       from tb_budget bd
+		                            inner join tb_order od on od.order_no = bd.order_no
+		                            inner join tb_order_dt odd on od.order_no = odd.order_no
+		                            inner join tb_clnt cl on od.clnt_no = cl.clnt_no
+		                     union
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,dl.dlv_no as no 
+		                           ,dl.dlv_date as pdate
+		                           ,dl.loginID -- 담당자
+		                           ,(pd.product_unit_price * dl.dlv_amt) as amt
+		                           ,sp.splr_name as client 
+		                       from tb_budget bd
+		                            inner join tb_dlv dl on dl.dlv_no = bd.dlv_no
+		                            inner join tb_product pd on dl.product_no = pd.product_no
+		                            inner join tb_splr sp on dl.splr_no = sp.splr_no
+		                     union
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,er.expen_report_no as no  
+		                           ,er.expen_date as pdate 
+		                           ,er.loginID 
+		                           ,er.expen_price as amt 
+		                           ,er.expen_shop as client                        
+		                       from tb_budget bd
+		                            inner join tb_expen_report er on er.expen_report_no = bd.expen_report_no
+		                            inner join tb_dt_sbject ds on er.acnt_dt_sbject_cd = ds.acnt_dt_sbject_cd 
+		        ) ll
+		        inner join tb_dt_sbject ds on ds.acnt_sbject_cd = ll.acnt_sbject_cd and ds.acnt_dt_sbject_cd = ll.acnt_dt_sbject_cd
+		        inner join tb_userinfo ui on ui.loginID = ll.loginID
+            inner join tb_acnt_sbject asb on asb.acnt_sbject_cd = ll.acnt_sbject_cd
+		        <where>
+					<if test ="(start != null) and (!start.equals(''))" >
+       				   and ll.pdate <![CDATA[>=]]> STR_TO_DATE(#{start}, '%Y-%m-%d')    
+			        </if>
+			        <if test ="(end != null) and (!end.equals(''))" >
+       				   and ll.pdate <![CDATA[<=]]> DATE_ADD(STR_TO_DATE(#{end} , '%Y-%m-%d'), INTERVAL 1 DAY)
+			        </if>
+		        	<if test="(clicombo != null) and (!clicombo.equals(''))">
+<!-- 			        	<choose>  -->
+<!-- 			        		<when test="clicombo eq 1"> -->
+<!-- 			        			and ll.client = '태평물산' -->
+<!-- 			        		</when> -->
+<!-- 			        	</choose> -->
+			        	and ll.client = (select clnt_name from tb_clnt where clnt_no = #{clicombo})
+			        </if>
+			        
+			        
+			        
+			        <if test="(acccombo != null) and (!acccombo.equals(''))">
+			        	and ll.acnt_sbject_cd = #{acccombo}
+			        </if>
+			        <if test="(accdcombo != null) and (!accdcombo.equals(''))">
+			        	and ll.acnt_dt_sbject_cd = #{accdcombo}
+			        </if>
+		        </where>		
+		        ORDER BY budget_no DESC
+		        LIMIT #{pageindex}, #{pageSize}
+	</select>
+	
+	<select id="countactlist" resultType="int">
+			select count(*)
+		      from (
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,od.order_no as no
+		                           ,od.order_date as pdate 
+		                           ,od.loginID 
+		                           ,od.order_tot_price as amt
+		                           ,cl.clnt_name as client
+		                       from tb_budget bd
+		                            inner join tb_order od on od.order_no = bd.order_no
+		                            inner join tb_order_dt odd on od.order_no = odd.order_no
+		                            inner join tb_clnt cl on od.clnt_no = cl.clnt_no
+		                     union
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,dl.dlv_no as no 
+		                           ,dl.dlv_date as pdate
+		                           ,dl.loginID -- 담당자
+		                           ,(pd.product_unit_price * dl.dlv_amt) as amt
+		                           ,sp.splr_name as client 
+		                       from tb_budget bd
+		                            inner join tb_dlv dl on dl.dlv_no = bd.dlv_no
+		                            inner join tb_product pd on dl.product_no = pd.product_no
+		                            inner join tb_splr sp on dl.splr_no = sp.splr_no
+		                     union
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,er.expen_report_no as no  
+		                           ,er.expen_date as pdate 
+		                           ,er.loginID 
+		                           ,er.expen_price as amt 
+		                           ,er.expen_shop as client                        
+		                       from tb_budget bd
+		                            inner join tb_expen_report er on er.expen_report_no = bd.expen_report_no
+		                            inner join tb_dt_sbject ds on er.acnt_dt_sbject_cd = ds.acnt_dt_sbject_cd 
+		        ) ll
+		        inner join tb_dt_sbject ds on ds.acnt_sbject_cd = ll.acnt_sbject_cd and ds.acnt_dt_sbject_cd = ll.acnt_dt_sbject_cd
+		        inner join tb_userinfo ui on ui.loginID = ll.loginID
+            	inner join tb_acnt_sbject asb on asb.acnt_sbject_cd = ll.acnt_sbject_cd
+		        <where>
+					<if test ="(start != null) and (!start.equals(''))" >
+       				   and ll.pdate <![CDATA[>=]]> STR_TO_DATE(#{start}, '%Y-%m-%d')    
+			        </if>
+			        <if test ="(end != null) and (!end.equals(''))" >
+       				   and ll.pdate <![CDATA[<=]]> DATE_ADD(STR_TO_DATE(#{end} , '%Y-%m-%d'), INTERVAL 1 DAY)
+			        </if>
+		        	<if test="(clicombo != null) and (!clicombo.equals(''))">
+<!-- 			        	<choose>  -->
+<!-- 			        		<when test="clicombo eq 1"> -->
+<!-- 			        			and ll.client = '태평물산' -->
+<!-- 			        		</when> -->
+<!-- 			        	</choose> -->
+			        	and ll.client = (select clnt_name from tb_clnt where clnt_no = #{clicombo})	
+			        	
+			        </if>
+			        <if test="(acccombo != null) and (!acccombo.equals(''))">
+			        	and ll.acnt_sbject_cd = #{acccombo}
+			        </if>
+			        <if test="(accdcombo != null) and (!accdcombo.equals(''))">
+			        	and ll.acnt_dt_sbject_cd = #{accdcombo}
+			        </if>
+		        </where>
+	</select>
+	
+	<select id="accountSearchSelectone" resultType="kr.happyjob.study.accAcs.model.accAcsModel">
+		select ll.budget_no
+		      ,ll.acnt_sbject_cd
+		      ,ll.acnt_dt_sbject_cd
+		      ,ll.expen_report_no
+		      ,ll.dlv_no
+		      ,ll.order_no
+		      ,ll.no
+		      ,ll.pdate
+		      ,ll.loginID
+		      ,ui.name
+		      ,case when asb.acnt_sbjct_inout = '1' then '수입'
+		            when asb.acnt_sbjct_inout = '2' then '지출'
+		            else ''
+		       end as acnt_sbjct_inout 
+		      ,ds.acnt_dt_sbjct_name as acnt_dt_sbjct_name
+		      ,ll.client
+		      ,case when asb.acnt_sbjct_inout = '1' then 0
+		            when asb.acnt_sbjct_inout = '2' then ll.amt
+		            else 0
+		       end as outamt 
+		      ,case when asb.acnt_sbjct_inout = '1' then ll.amt
+		            when asb.acnt_sbjct_inout = '2' then 0
+		            else 0
+		       end as inamt 
+		  from (
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,od.order_no as no
+		                           ,od.order_date as pdate 
+		                           ,od.loginID 
+		                           ,od.order_tot_price as amt
+		                           ,cl.clnt_name as client
+		                       from tb_budget bd
+		                            inner join tb_order od on od.order_no = bd.order_no
+		                            inner join tb_order_dt odd on od.order_no = odd.order_no
+		                            inner join tb_clnt cl on od.clnt_no = cl.clnt_no
+		                     union
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,dl.dlv_no as no 
+		                           ,dl.dlv_date as pdate
+		                           ,dl.loginID -- 담당자
+		                           ,(pd.product_unit_price * dl.dlv_amt) as amt
+		                           ,sp.splr_name as client 
+		                       from tb_budget bd
+		                            inner join tb_dlv dl on dl.dlv_no = bd.dlv_no
+		                            inner join tb_product pd on dl.product_no = pd.product_no
+		                            inner join tb_splr sp on dl.splr_no = sp.splr_no
+		                     union
+		                     select bd.budget_no
+		                           ,bd.acnt_sbject_cd
+		                           ,bd.acnt_dt_sbject_cd
+		                           ,bd.expen_report_no
+		                           ,bd.dlv_no
+		                           ,bd.order_no
+		                           ,er.expen_report_no as no  
+		                           ,er.expen_date as pdate 
+		                           ,er.loginID 
+		                           ,er.expen_price as amt 
+		                           ,er.expen_shop as client                        
+		                       from tb_budget bd
+		                            inner join tb_expen_report er on er.expen_report_no = bd.expen_report_no
+		                            inner join tb_dt_sbject ds on er.acnt_dt_sbject_cd = ds.acnt_dt_sbject_cd 
+		        ) ll
+		        inner join tb_dt_sbject ds on ds.acnt_sbject_cd = ll.acnt_sbject_cd and ds.acnt_dt_sbject_cd = ll.acnt_dt_sbject_cd
+		        inner join tb_userinfo ui on ui.loginID = ll.loginID
+            inner join tb_acnt_sbject asb on asb.acnt_sbject_cd = ll.acnt_sbject_cd
+		        <where>
+		        budget_no = #{budget_no}
+		        </where>
+	
+	</select>
+	
+	
+</mapper>

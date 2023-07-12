@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.empSam.dao.EmpSamDao">
+
+	<!--  목록 조회 -->
+	<select id="empSamList" resultType="kr.happyjob.study.empSam.model.SalManagementModel">
+		/*kr.happyjob.study.empSam.dao.EmpSamDao*/
+        select  
+     		 substr(sal.sal_date, 1, 7) as sal_date<!-- 년 월만 출력 -->
+      		,sal.loginID
+			,user.name
+			,deptn.detail_name as dept_name
+			,leveln.detail_name as level_name
+			,user.emp_yr_sal
+			,sal.sal_pre 
+			,user.sal_kuk
+			,user.sal_kun
+			,user.sal_san
+			,user.sal_ko
+			,sal.sal_after 
+			,user.emp_final_money
+			,user.emp_memo
+			,sal.sal_pay_yn
+		from tb_sal sal
+  			inner join tb_userinfo user
+  						on user.loginID = sal.loginID
+  			inner join (select detail_code, detail_name from tb_detail_code ) deptn on deptn.detail_code = user.dept_cd
+  			inner join (select detail_code, detail_name from tb_detail_code ) leveln on leveln.detail_code = user.level_cd
+        
+		<where>
+		<if test="(dept_cd != null) and (!dept_cd.equals(''))">
+		    and deptn.detail_code = #{dept_cd}
+		</if>
+		<if test="(level_cd != null) and (!level_cd.equals(''))">
+		    and leveln.detail_code = #{level_cd}
+		</if>
+		<if test="(sal_pay_yn != null) and (!sal_pay_yn.equals(''))">
+		    and sal.sal_pay_yn = #{sal_pay_yn}
+		</if>
+		<if test="(sname != null) and (!sname.equals(''))">
+				<choose>
+					<when
+						test="emp_info eq 'loginID'.toString()">
+						and user.loginID Like CONCAT('%', #{sname}, '%')
+					</when>
+					<when
+						test="emp_info eq 'name'.toString()">
+						and user.name LIKE CONCAT('%', #{sname}, '%')
+					</when>
+				</choose>
+			</if>		
+		</where>		
+		ORDER BY sal.sal_date DESC
+		LIMIT #{pageindex}, #{pageSize} 
+		
+	</select>
+	
+	<!-- 목록 총 갯수 조회 -->
+	<select id="countEmpSamList" resultType="int">
+		/*kr.happyjob.study.empSam.dao.EmpSamDao.countEmpSamlist*/
+		select count(*)
+          from tb_sal sal
+               inner join tb_userinfo user
+  						on user.loginID = sal.loginID
+  				inner join (select detail_code, detail_name from tb_detail_code ) deptn on deptn.detail_code = user.dept_cd
+  			inner join (select detail_code, detail_name from tb_detail_code ) leveln on leveln.detail_code = user.level_cd
+		<where>
+		<if test="(dept_cd != null) and (!dept_cd.equals(''))">
+		    and deptn.detail_code = #{dept_cd}
+		</if>
+		<if test="(level_cd != null) and (!level_cd.equals(''))">
+		    and leveln.detail_code = #{level_cd}
+		</if>
+		<if test="(sal_pay_yn != null) and (!sal_pay_yn.equals(''))">
+		    and sal.sal_pay_yn = #{sal_pay_yn}
+		</if>
+		<if test="(sname != null) and (!sname.equals(''))">
+				<choose>
+					<when
+						test="emp_info eq 'loginID'.toString()">
+						and user.loginID Like CONCAT('%', replace(#{sname},' ',''), '%')
+					</when>
+					<when
+						test="emp_info eq 'name'.toString()">
+						and user.name LIKE CONCAT('%', replace(#{sname},' ',''), '%')
+					</when>
+				</choose>
+			</if>		
+		</where>	
+	</select>
+	
+	
+	<!-- 개별지급쿼리 -->
+	<update id="salPayOne">
+		update tb_sal
+			set sal_pay_yn = 'Y'
+		  where loginID = #{loginID} and sal_date = #{sal_date}
+		  
+	</update>
+	
+	<!-- 일괄지급 쿼리 -->
+	<update id="salPayAll">
+	/*kr.happyjob.study.empSam.dao.EmpSamDao.salPayAll*/
+		update tb_userinfo user
+			inner join tb_sal sal on user.loginID = sal.loginID
+			set sal.sal_pay_yn = 'Y'
+				  	<where>
+						<if test="(dept_cd != null) and (!dept_cd.equals(''))">
+						    and user.dept_cd = #{dept_cd}
+						</if>
+						<if test="(level_cd != null) and (!level_cd.equals(''))">
+						    and user.level_cd = #{level_cd}
+						</if>
+						<if test="(sal_pay_yn != null) and (!sal_pay_yn.equals(''))">
+						    and sal.sal_pay_yn = #{sal_pay_yn}
+						</if>
+						<if test="(sname != null) and (!sname.equals(''))">
+							<choose>
+								<when
+									test="emp_info eq 'loginID'.toString()">
+									and user.loginID LIKE CONCAT('%', replace(#{sname},' ',''), '%')
+								</when>
+								<when
+									test="emp_info eq 'emp_name'.toString()">
+									and user.name LIKE CONCAT('%', replace(#{sname},' ',''), '%')
+								</when>
+							</choose>
+						</if>	
+						and sal.sal_date LIKE CONCAT('%', DATE_FORMAT(now(), '%Y-%m'), '%')
+						and sal.sal_pay_yn = 'N'
+					</where>
+	
+	</update>
+	
+	<!-- 최근 급여 확인/급여계산전 확인 -->
+	<select id="calSalChk" resultType="Integer">
+		select CAST(CONCAT(SUBSTRING(sal.sal_date, 1, 4),SUBSTRING(sal.sal_date, 6, 2)) AS UNSIGNED) as sal_date
+			from (select sal_date from tb_sal order by sal_date desc) sal
+			group by sal.sal_date
+	</select>
+	
+	
+	
+	<!-- 급여계산 -->
+	<insert id="calSal">
+		insert into tb_sal(
+		   loginID
+		  ,sal_date
+		  ,sal_kun_com
+		  ,sal_kun_emp
+		  ,sal_ko_com
+		  ,sal_ko_emp
+		  ,sal_san_com
+		  ,sal_san_emp
+		  ,sal_kuk_com
+		  ,sal_kuk_emp
+		  ,sal_pre
+		  ,sal_after
+		) select loginID
+				 ,#{calDate}
+      			 ,ROUND((sal_kun/2),2) as sal_kun_com
+      			 ,ROUND((sal_kun/2),2) as sal_kun_emp
+      			 ,ROUND((sal_ko/2),2) as sal_ko_com
+      			 ,ROUND((sal_ko/2),2) as sal_ko_emp
+      			 ,ROUND((sal_san/2),2) as sal_san_com
+      			 ,ROUND((sal_san/2),2) as sal_san_emp
+      			 ,ROUND((sal_kuk/2),2) as sal_kuk_com
+      			 ,ROUND((sal_kuk/2),2) as sal_kuk_emp
+      			 ,sal_pre
+      			 ,sal_after
+  				from tb_userinfo 
+  					where emp_work_yn = 'Y'
+
+	</insert>
+	
+	
+
+	
+	
+</mapper>

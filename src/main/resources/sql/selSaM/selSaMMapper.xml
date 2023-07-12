@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.selSaM.dao.SelSaMDao">
+
+    <!-- 목록 조회 -->
+    <select id="saleMonthList" resultType="kr.happyjob.study.selSaM.model.SelSaMModel">
+        SELECT
+        DATE_FORMAT(od.order_date, '%Y-%m') as order_month,
+        SUM(odt.order_dt_amt) as order_month_dt_amt,
+        SUM(od.order_tot_price) as order_month_tot_price,
+        SUM(pd.product_price * odt.order_dt_amt) as order_month_tot_product_price,
+        SUM(pd.product_unit_price * odt.order_dt_amt) as order_month_tot_product_unit_price,
+        SUM(pd.product_price * odt.order_dt_amt - pd.product_unit_price * odt.order_dt_amt) as tot_profit
+        FROM tb_order od
+        INNER JOIN tb_order_dt odt ON od.order_no = odt.order_no
+        INNER JOIN tb_product pd ON odt.product_no = pd.product_no
+        <if test="(order_month != null) and (!order_month.equals(''))">
+            WHERE od.order_date between DATE_SUB(LAST_DAY(concat(#{order_month},'-01')), INTERVAL 6 MONTH) AND
+            LAST_DAY(concat(#{order_month},'-01'))
+        </if>
+        GROUP BY DATE_FORMAT(od.order_date,'%Y-%m')
+        ORDER BY od.order_date DESC
+
+    </select>
+
+    <!-- 목록 개수 조회 -->
+    <select id="countSaleMonthList" resultType="int">
+         select count(ll.cnt)
+          from ( 
+			        SELECT COUNT(*) cnt
+			          FROM tb_order od
+			                   INNER JOIN tb_order_dt odt ON od.order_no = odt.order_no
+			                   INNER JOIN tb_product pd ON odt.product_no = pd.product_no
+			        <if test="(order_month != null) and (!order_month.equals(''))">
+			            WHERE od.order_date  between DATE_SUB(LAST_DAY(concat(#{order_month},'-01')), INTERVAL 6 MONTH)   AND LAST_DAY(concat(#{order_month},'-01'))
+			        </if>
+			        GROUP BY DATE_FORMAT(od.order_date,'%Y-%m')
+			     ) ll
+    </select>
+
+</mapper>

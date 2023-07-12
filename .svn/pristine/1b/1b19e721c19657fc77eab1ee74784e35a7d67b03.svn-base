@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.busDlv.dao.BusDlvDao">
+	
+	<!-- 발주내역리스트 조회 -->
+	<select id="busDlvList" resultType="kr.happyjob.study.busDlv.model.DeliveryInfoModel">
+		select dlv.dlv_no
+			  ,pd.product_name
+			  ,sp.splr_name
+			  ,dlv.loginID
+			  ,dlv.dlv_amt
+			  ,dlv.dlv_date
+			  ,dlv.dlv_state
+			  ,dlv.appro_no
+			  ,dlv.appro_bos
+			  ,dlv.appro_yn
+			  ,dlv.dlv_rej
+			from tb_dlv dlv
+				inner join tb_product pd on pd.product_no = dlv.product_no
+				inner join tb_splr sp on sp.splr_no = dlv.splr_no
+			<where>
+            <if test="(loginID != null) and (!loginID.equals(''))">
+               and dlv.loginID LIKE CONCAT('%' , replace(#{loginID},' ',''), '%')
+            </if>
+            <if test="(dlv_sdate != null) and (!dlv_sdate.equals(''))">
+               and dlv.dlv_date >= STR_TO_DATE(#{dlv_sdate}, '%Y-%m-%d')
+            </if>
+            <if test="(dlv_edate != null) and (!dlv_edate.equals(''))">
+               and STR_TO_DATE(#{dlv_edate}, '%Y-%m-%d') >= dlv.dlv_date
+            </if>      
+         </where>
+         order by dlv.dlv_no desc
+			LIMIT #{pageindex}, #{pageSize} 
+			
+	</select>
+	
+	<select id="countBusDlvList" resultType="int">
+		select count(*)
+			from tb_dlv 
+		<where>
+            <if test="(loginID != null) and (!loginID.equals(''))">
+               and loginID LIKE CONCAT('%' , replace(#{loginID},' ',''), '%')
+            </if>
+            <if test="(dlv_sdate != null) and (!dlv_sdate.equals(''))">
+               and dlv_date >= STR_TO_DATE(#{dlv_sdate}, '%Y-%m-%d')
+            </if>
+            <if test="(dlv_edate != null) and (!dlv_edate.equals(''))">
+               and STR_TO_DATE(#{dlv_edate}, '%Y-%m-%d') >= dlv_date
+            </if>      
+         </where>	
+	
+	</select>
+	
+	<!-- 반려사유 상세조회 -->
+	<select id="rejDetail" resultType="String">
+		select dlv_rej from tb_dlv where dlv_no = #{dlv_no}
+	</select>
+	
+<!-- 발주신청 -->
+	<!-- 발주번호 얻어오기 -->
+	<select id="dlvApplicationNo" resultType="int">
+		select MAX(dlv_no)+1 from tb_dlv
+	</select>
+	
+	<!-- 발주테이블에 insert -->
+	<insert id="dlvApplication">
+		insert into tb_dlv
+			(
+				dlv_no
+				,product_no
+				,splr_no
+				,loginID
+				,dlv_amt
+				,dlv_date
+			) values (
+				#{dlv_no}
+				,#{ptypecombo}
+				,#{mtypecombo}
+				,#{form_loginID}
+				,#{dlv_amt}
+				,now()
+			)
+	</insert>
+	
+	<!-- 결재테이블에 insert -->
+	<insert id="approIn">
+		<selectKey resultType="int" keyProperty="appro_no" order="BEFORE">
+            select ifnull(max(appro_no),0)+1 from tb_appro 
+        </selectKey> 
+		insert into tb_appro
+			(
+				 appro_no
+				,loginID
+				,appro_type_cd
+				,dlv_no
+				,appro_req_date
+				,dept_cd
+				,appro_price
+			) values (
+				 #{appro_no}
+				,#{form_loginID}
+				,#{appro_type_cd}
+				,#{dlv_no}
+				,(select dlv_date from tb_dlv where dlv_no = #{dlv_no})
+				,(select dept_cd from tb_userinfo where loginID = #{form_loginID})
+				,(select product_price*#{dlv_amt} from tb_product where product_no = #{ptypecombo})
+			)
+					
+	</insert>
+	
+	<!-- 결재테이블에 insert된 결재번호 발주 테이블에 update -->
+	<update id="dlvApproUpdate">
+		update tb_dlv set appro_no = (select appro_no from tb_appro where dlv_no = #{dlv_no})
+			where dlv_no = #{dlv_no}
+	</update>
+<!-- 휴가신청끝 -->
+	
+</mapper>

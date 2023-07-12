@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!--ww -->
+<mapper namespace="kr.happyjob.study.emp.dao.EmpDao">
+    <!--  목록 조회 -->
+    <select id="empList" resultType="kr.happyjob.study.emp.model.EmpModel">
+    select em.loginId
+           ,em.name
+           ,em.dept_cd
+           ,em.level_cd
+           ,em.emp_sdate
+           ,em.emp_work_yn
+    from tb_userinfo em
+
+        <where>
+            <if test="(deptcd != null) and (!deptcd.equals(''))">
+                and em.dept_cd = #{deptcd}
+            </if>
+            <if test="(lvcd != null) and (!lvcd.equals(''))">
+                and em.level_cd = #{lvcd}
+            </if>
+            <if test="(ename != null) and (!ename.equals(''))">
+                <choose>
+                    <when
+                            test="searchKey eq 'loginid'.toString()">
+                        and em.loginId Like CONCAT('%', #{ename}, '%')
+                    </when>
+                    <when
+                            test="searchKey eq 'name'.toString()" >
+                        and em.name LIKE CONCAT('%', #{ename}, '%')
+                    </when>
+                    <otherwise>
+                        and (   em.loginId Like CONCAT('%', #{ename}, '%')
+                        or      em.name LIKE CONCAT('%', #{ename}, '%')
+                        )
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    ORDER BY CAST(em.loginID AS UNSIGNED) desc
+    LIMIT #{pageindex}, #{pageSize}
+    
+    </select>
+
+    <select id="countempList" resultType="int">
+        select count(*)
+        from tb_userinfo em
+
+        <where>
+            <if test="(deptcd != null) and (!deptcd.equals(''))">
+                and em.dept_cd = #{deptcd}
+            </if>
+            <if test="(lvcd != null) and (!lvcd.equals(''))">
+                and em.level_cd = #{lvcd}
+            </if>
+            <if test="(ename != null) and (!ename.equals(''))">
+                <choose>
+                    <when
+                            test="searchKey eq 'loginid'.toString()">
+                        and em.loginId Like CONCAT('%', #{ename}, '%')
+                    </when>
+                    <when
+                            test="searchKey eq 'name'.toString()">
+                        and em.name LIKE CONCAT('%', #{ename}, '%')
+                    </when>
+                    <otherwise>
+                        and (   em.loginId Like CONCAT('%', #{ename}, '%')
+                        or      em.name LIKE CONCAT('%', #{ename}, '%')
+                        )
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+
+    </select>
+
+    <select id="empSelectOne" resultType="kr.happyjob.study.emp.model.EmpModel">
+        select 
+        em.loginID,
+        em.user_type,
+        em.user_type,
+        em.password,
+        em.emp_birth,
+        em.name,
+        em.emp_sex,
+        em.emp_edu,
+        em.emp_email,
+        em.emp_hp,
+        em.emp_zip,
+        em.emp_addr,
+        em.emp_dt_addr,
+        em.bk_cd,
+        em.emp_account,
+        em.dept_cd,
+        em.level_cd,
+        em.emp_yr_sal,
+        em.emp_sdate,
+        em.emp_edate,
+        em.retire_reason,
+        em.file_no,
+        fi.file_name,
+        fi.logic_path,
+        fi.physic_path,
+        fi.file_size,
+        fi.exten
+        from tb_userinfo em
+             left outer join tb_file fi on fi.file_no = em.file_no  
+             
+
+
+
+        where em.loginId= #{loginID}
+
+    </select>
+
+
+	<insert id = "fileinsert">
+	    <selectKey resultType="int" keyProperty="no" order="BEFORE">
+            select ifnull(max(file_no),0) + 1 from tb_file
+        </selectKey>
+			insert into tb_file
+	         (
+	             file_no
+               , file_name
+               , logic_path
+               , physic_path
+               , file_size
+               , exten
+	         ) values (
+	            #{no}
+	           ,#{filereturn.file_nm}   
+	           ,#{filereturn.vrfile_loc}   
+	           ,#{filereturn.file_loc}   
+	           ,#{filereturn.file_size}   
+	           ,#{filereturn.fileExtension}  
+	         )
+	</insert>
+
+
+    <insert id="empInsert">
+        <selectKey resultType="string" keyProperty="id" order="BEFORE">
+            select ifnull(concat(substring(max(loginID),1,6),lpad(cast(substring(max(loginID),7,3) as unsigned) + 1,3,'0')),concat(DATE_FORMAT(now(), '%Y%m'),'001'))
+            from tb_userinfo
+            where loginID like concat(DATE_FORMAT(now(), '%Y%m'),'%')
+        </selectKey>
+
+
+
+
+        insert into tb_userinfo
+        (
+        loginID,
+        emp_work_yn,
+        sal_date,
+        password,
+        user_type,
+        emp_birth,
+        name,
+        emp_sex,
+        emp_edu,
+        emp_email,
+        emp_hp,
+        emp_zip,
+        emp_addr,
+        emp_dt_addr,
+        bk_cd,
+        dept_cd,
+        level_cd,
+        emp_sdate,
+        emp_edate,
+        emp_final_money,
+        retire_reason,
+        emp_yr_sal,
+        emp_account,
+        sal_san,
+        sal_ko,
+        sal_kun,
+        sal_kuk,
+
+        sal_pre,
+        sal_after,
+        file_no
+        
+        )
+        values (
+        #{id}
+        ,'Y'
+        ,date_format(now(),'%Y-%m-%d')
+          ,'0000'
+        ,#{user_type}
+            ,#{emp_birth}
+
+            ,#{name}
+
+            ,#{emp_sex}
+
+            ,#{emp_edu}
+
+            ,#{emp_email}
+
+            ,#{emp_hp}
+
+            ,#{emp_zip}
+
+            ,#{emp_addr}
+
+            ,#{emp_dt_addr}
+        ,#{bk_cd}
+
+
+        ,#{dept_cd}
+        ,#{level_cd}
+        ,date_format(now(),'%Y-%m-%d')
+        ,#{emp_edate}
+        ,#{emp_final_money}
+        ,#{retire_reason}
+        ,#{emp_yr_sal}
+        ,#{emp_account}
+
+            ,#{sal_san}
+
+            ,#{sal_ko}
+
+            ,#{sal_kun}
+
+            ,#{sal_kuk}
+
+            ,#{sal_pre}
+
+            ,#{sal_after}
+            <if test="fileexist eq 'Y'.toString()">
+            ,(select ifnull(max(file_no),0)  from tb_file)
+			</if>
+			<if test="fileexist eq 'N'.toString()">
+                ,0
+             </if>
+        )
+    </insert>
+
+    <update id="empUpdate">
+        update tb_userinfo
+        set user_type =  #{user_type}
+       	  , name = #{name}
+          , emp_edu =  #{emp_edu}
+          , emp_sex =  #{emp_sex}
+          , emp_email =  #{emp_email}
+          , emp_hp =  #{emp_hp}
+          , emp_zip =  #{emp_zip}
+          , emp_addr =  #{emp_addr}
+          , emp_dt_addr =  #{emp_dt_addr}
+          , bk_cd =  #{bk_cd}
+          , dept_cd =  #{dept_cd}
+          , level_cd =  #{level_cd}
+          , emp_yr_sal =  #{emp_yr_sal}
+          , retire_reason =  #{retire_reason}
+          , emp_birth = #{emp_birth}
+
+          , sal_san = #{sal_san}
+
+          , sal_ko = #{sal_ko}
+
+          , sal_kun = #{sal_kun}
+
+          , sal_kuk = #{sal_kuk}
+
+          , sal_pre = #{sal_pre}
+
+          , sal_after = #{sal_after}
+          
+          
+         	 <if test="fileexist eq 'Y'.toString()">
+                , file_no = (select ifnull(max(file_no),0)  from tb_file)
+             </if>
+             <if test="fileexist eq 'N'.toString()">
+                , file_no = 0
+             </if>
+             
+             
+        where  loginID =  #{loginID}
+    </update>
+
+    <update id="empDelete">
+        update tb_userinfo
+        set emp_work_yn =  'N'
+        , emp_edate = date_format(now(),'%Y-%m-%d')
+        , emp_final_money= #{emp_final_money}
+        , emp_final_money= #{emp_final_money}
+        where  loginID =  #{loginID}
+    </update>
+
+    <select id="maxMethod3" resultType="string">
+        select CAST(MAX(CAST(loginID AS UNSIGNED)) AS CHAR) FROM tb_userinfo
+    </select>
+
+    <insert id="vaceInsert">
+    <selectKey resultType="int" keyProperty="no" order="BEFORE">
+        select ifnull(max(dt_vaca_no),0) + 1 from tb_dt_vacation
+    </selectKey>
+        insert into tb_dt_vacation
+        (dt_vaca_no,
+        dt_va_tot,
+        dt_vaca_rest,
+        loginID
+        )
+        values
+        (#{no}
+        ,#{dt_va_tot}
+        ,#{dt_va_tot}
+        ,#{max3}
+
+       )
+    </insert>
+
+    <update id="vaceUpdate">
+        update tb_dt_vacation
+        set
+
+            dt_va_tot= #{dt_va_tot}
+
+        where  loginID =  #{loginID}
+    </update>
+
+
+	<delete id="deletefileinfo">
+	         delete from tb_file
+             where file_no = ( 
+                                       select file_no 
+                                        from tb_userinfo
+                                      where loginID =  #{loginID}
+                                   )
+	</delete>
+
+
+	
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.accAcm.dao.accAcmDao">
+	<select id="accAcmSearchList" resultType="kr.happyjob.study.accAcm.model.accAcmModel">
+		select acnt_sbject_cd, acnt_sbjct_inout, acnt_sbject_name
+  		  from tb_acnt_sbject 
+       		   <where>
+					<if test="(acnt_sbjct_inout != null) and (!acnt_sbjct_inout.equals(''))">
+				        	and acnt_sbjct_inout = #{acnt_sbjct_inout}
+				    </if>
+			    </where>
+		    	ORDER BY acnt_sbject_cd
+		        LIMIT #{pageindex}, #{pageSize}
+	</select>
+	
+	<select id="countactlist" resultType="int">
+		select count(*)
+  		  from tb_acnt_sbject ab
+    		    <where>
+					<if test="(acnt_sbjct_inout != null) and (!acnt_sbjct_inout.equals(''))">
+				        	and acnt_sbjct_inout = #{acnt_sbjct_inout}
+				    </if>
+			    </where>
+	</select>
+	
+	<insert id="bigInsert" >
+		insert into tb_acnt_sbject(acnt_sbject_cd, acnt_sbject_name, acnt_sbjct_inout)
+		values (#{acnt_sbject_cd},#{acnt_sbject_name}, #{M_acnt_sbjct_inout})
+	</insert>
+	
+	
+	<select id="accAcmSListSearch" resultType="kr.happyjob.study.accAcm.model.accAcmModel">
+		   select  
+			      ab.acnt_sbjct_inout as acnt_sbjct_inout
+				, ab.acnt_sbject_name as acnt_sbject_name
+				, ads.acnt_dt_sbject_cd as acnt_dt_sbject_cd
+				, ads.acnt_dt_sbjct_name  as acnt_dt_sbjct_name
+		     from tb_acnt_sbject ab
+		    inner join tb_dt_sbject ads on ab.acnt_sbject_cd = ads.acnt_sbject_cd
+			
+       		   <where>
+					<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+				        	and ads.acnt_sbject_cd = #{acnt_sbject_cd}
+				    </if>
+			    </where>
+			
+	</select>
+	<select id="countSList" resultType="int" >
+		select count(*)
+  		  from tb_acnt_sbject ab
+         inner join tb_dt_sbject ads on ab.acnt_sbject_cd = ads.acnt_sbject_cd
+         <where>
+					<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+				        	and ads.acnt_sbject_cd = #{acnt_sbject_cd}
+				    </if>
+		</where>
+	</select>
+	
+	<insert id="smallInsert" >
+		insert into tb_dt_sbject(acnt_sbject_cd, acnt_dt_sbject_cd, acnt_dt_sbjct_name)
+		values (#{acnt_sbject_cdd},#{acnt_dt_sbject_cd}, #{acnt_dt_sbjct_name})
+	</insert>
+	
+	<select id="LCdDupChked" resultType="int">
+		select count(*)
+		from tb_acnt_sbject
+	   	<where>
+			<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+			        	and acnt_sbject_cd = #{acnt_sbject_cd}
+		    </if>
+	    </where>
+	</select>
+	    
+	<select id="LNmDupChked" resultType="int">
+		select count(*)
+		from tb_acnt_sbject
+	   	<where>
+			<if test="(acnt_sbject_name != null) and (!acnt_sbject_name.equals(''))">
+			        	and acnt_sbject_name = #{acnt_sbject_name}
+		    </if>
+	    </where>
+	</select>
+	    
+ 	<select id="SCdDupChk" resultType="int">
+		select count(*)
+		from tb_dt_sbject
+	   	<where>
+			<if test="(acnt_dt_sbject_cd != null) and (!acnt_dt_sbject_cd.equals(''))">
+			        	and acnt_dt_sbject_cd = #{acnt_dt_sbject_cd}
+		    </if>
+	    </where>
+	</select>   
+	    
+	 
+	
+	
+</mapper>

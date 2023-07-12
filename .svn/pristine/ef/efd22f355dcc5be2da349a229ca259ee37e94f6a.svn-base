@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.accEpr.dao.AccEprDao">
+
+	<!--  목록 조회 -->
+	<select id="expenseRequireList" resultType="kr.happyjob.study.accEpr.model.AccEprModel">
+		/*kr.happyjob.study.accEpr.dao.AccEprDao.expenseRequireList*/
+      select  
+       er.loginID
+      ,ui.name 
+      ,er.expen_report_no
+      ,format(cast(er.expen_price as decimal),0)as expen_price
+      ,er.expen_inf
+      ,DATE_FORMAT(er.expen_date,'%Y-%m-%d') as expen_date
+      ,CONCAT(
+      					DATE_FORMAT(er.expen_date,'%Y'),'년'
+      					,DATE_FORMAT(er.expen_date,'%m'),'월'
+      					,DATE_FORMAT(er.expen_date,'%d'),'일'
+      					
+      				) as expen_date
+      ,case when ap.appro_yn = 'Y' then '결재'
+              when ap.appro_yn = 'N' then '반려'
+       end as appro_yn
+      ,ap.appro_no
+      ,ui2.name as appro_bos
+      ,er.acnt_sbject_cd
+      ,er.acnt_dt_sbject_cd
+      ,ac.acnt_sbject_name
+      ,ds.acnt_dt_sbjct_name
+      ,ap.appro_date
+      ,DATE_FORMAT(ap.appro_req_date,'%Y-%m-%d') as appro_req_date
+      ,CONCAT(
+      					DATE_FORMAT(ap.appro_req_date,'%Y'),'년'
+      					,DATE_FORMAT(ap.appro_req_date,'%m'),'월'
+      					,DATE_FORMAT(ap.appro_req_date,'%d'),'일'
+      					
+      				) as appro_req_date
+      ,er.file_no
+      ,fi.file_name
+      ,fi.logic_path
+      ,fi.physic_path
+      ,fi.file_size
+      ,fi.exten
+      ,ac.acnt_sbject_name
+	  ,ds.acnt_dt_sbjct_name
+ from tb_expen_report er
+         inner join tb_userinfo ui on ui.loginID = er.loginID
+        left outer join tb_file fi on fi.file_no = er.file_no
+        inner join tb_acnt_sbject ac on ac.acnt_sbject_cd = er.acnt_sbject_cd 
+        inner join tb_dt_sbject ds on ds.acnt_dt_sbject_cd = er.acnt_dt_sbject_cd
+        left outer join tb_appro ap on  ap.appro_no = er.appro_no
+        left outer join tb_userinfo ui2 on ui2.loginID = ap.appro_bos
+ <where>
+ 
+    <if test="currentuserType != 'A'.toString()">
+          and er.loginID = #{currentLoginID}
+    </if>
+    
+	<if test="(from != null) and (!from.equals(''))  ">
+	    and ap.appro_req_date <![CDATA[>=]]>  STR_TO_DATE(#{from}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(to != null) and (!to.equals(''))">
+	     and ap.appro_req_date <![CDATA[<=]]> STR_TO_DATE(#{to}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(appro_yn != null) and (!appro_yn.equals(''))">
+		    and ap.appro_yn = #{appro_yn}
+	</if>
+	
+	<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+		    and er.acnt_sbject_cd = #{acnt_sbject_cd}
+	</if>
+	
+	<if test="(acnt_dt_sbject_cd != null) and (!acnt_dt_sbject_cd.equals(''))">
+		    and er.acnt_dt_sbject_cd = #{acnt_dt_sbject_cd}
+	</if>
+	
+	<if test="(sname != null) and (!sname.equals(''))">
+			and ui.name like  concat('%',#{sname},'%')
+	</if>	
+	
+	</where>		
+	ORDER BY ap.appro_no DESC
+	LIMIT #{pageIndex}, #{pageSize}
+		
+	</select>
+	
+	<!-- 목록 총 갯수 조회 -->
+	<select id="countList" resultType="int">
+		/*kr.happyjob.study.accEpr.dao.AccEprDao.countList*/
+		select count(*)
+ from tb_expen_report er
+          inner join tb_userinfo ui on ui.loginID = er.loginID
+          left outer join tb_file fi on fi.file_no = er.file_no
+          inner join tb_acnt_sbject ac on ac.acnt_sbject_cd = er.acnt_sbject_cd 
+          inner join tb_dt_sbject ds on ds.acnt_dt_sbject_cd = er.acnt_dt_sbject_cd
+          inner join tb_appro ap on ap.appro_no = er.appro_no
+          left outer join tb_userinfo ui2 on ui2.loginID = ap.appro_bos
+ <where>
+ 
+     <if test="currentuserType != 'A'.toString()">
+          and er.loginID = #{currentLoginID}
+    </if>
+ 
+	<if test="(from != null) and (!from.equals(''))  ">
+	     and ap.appro_req_date <![CDATA[>=]]>  STR_TO_DATE(#{from}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(to != null) and (!to.equals(''))">
+	     and ap.appro_req_date <![CDATA[<=]]> STR_TO_DATE(#{to}, '%Y-%m-%d')  
+	</if>
+	
+	<if test="(appro_yn != null) and (!appro_yn.equals(''))">
+		    and ap.appro_yn = #{appro_yn}
+	</if>
+	
+	<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+		    and er.acnt_sbject_cd = #{acnt_sbject_cd}
+	</if>
+	
+	<if test="(acnt_dt_sbject_cd != null) and (!acnt_dt_sbject_cd.equals(''))">
+		    and er.acnt_dt_sbject_cd = #{acnt_dt_sbject_cd}
+	</if>
+	
+	<if test="(sname != null) and (!sname.equals(''))">
+			and ui.name like  concat('%',#{sname},'%')
+	</if>	
+	
+	</where>		
+			
+	</select>
+	
+	<select id="listSelectOne" resultType="kr.happyjob.study.accEpr.model.AccEprModel">
+	 select er.loginID
+		      ,ui.name 
+		      ,format(cast(er.expen_price as decimal),0)as expen_price
+		      ,er.expen_inf
+		      ,er.expen_date
+		      ,er.expen_shop
+		      ,er.expen_report_no
+		      ,ap.appro_type_cd
+		      ,ap.dept_cd
+		      ,er.acnt_sbject_cd
+		      ,er.acnt_dt_sbject_cd
+		      ,ac.acnt_sbject_name
+		      ,ds.acnt_dt_sbjct_name
+		      ,ap.appro_req_date
+		      ,er.file_no
+		      ,fi.file_name
+		      ,fi.logic_path
+		      ,fi.physic_path
+		      ,fi.file_size
+		      ,fi.exten
+		      ,ap.appro_no
+		      ,ap.appro_yn
+	 from tb_expen_report er
+	 inner join tb_userinfo ui on er.loginID = ui.loginID
+	 left outer join tb_file fi on fi.file_no = er.file_no
+	 inner join tb_acnt_sbject ac on ac.acnt_sbject_cd = er.acnt_sbject_cd 
+	 inner join tb_dt_sbject ds on ds.acnt_dt_sbject_cd = er.acnt_dt_sbject_cd
+	 inner join tb_appro ap on ap.appro_no = er.appro_no
+	 where er.appro_no = #{appro_no} 
+	             
+	</select>
+	
+	<insert id="listInsert">
+	    <selectKey resultType="int" keyProperty="no" order="BEFORE">
+            select ifnull(max(expen_report_no),0) + 1 from tb_expen_report
+        </selectKey>  
+      
+      INSERT INTO tb_expen_report
+         (
+             loginID,
+             file_no,
+             expen_shop,
+             expen_report_no,
+             expen_price,
+             expen_inf,
+             expen_date,
+             appro_yn,
+             appro_no,
+             acnt_sbject_cd,
+             acnt_dt_sbject_cd
+        )  values (
+            #{loginID},
+             CASE
+                WHEN #{fileprc} = 'N' OR #{fileexist} = 'N' THEN 0
+                WHEN #{fileprc} = 'Y' AND #{fileexist} = 'Y' THEN (SELECT IFNULL(MAX(file_no), 0) FROM tb_file)
+                ELSE NULL
+             END,
+             #{expen_shop},
+             #{no},
+             #{expen_price},
+             #{expen_inf},
+            #{expen_date},
+            'N',
+            (select max(appro_no)  from tb_appro),
+            #{acnt_sbject_cd},
+            #{acnt_dt_sbject_cd}    
+        )
+	</insert>
+	
+	<insert id="approInsert">
+	    <selectKey resultType="int" keyProperty="no" order="BEFORE">
+            select ifnull(max(appro_no),0) + 1 from tb_appro
+        </selectKey>  
+      
+        INSERT INTO tb_appro
+          (
+          	loginID,
+             file_no,
+             appro_no,
+             appro_type_cd,
+             appro_req_date,
+             dept_cd,
+             appro_price,
+             appro_yn,
+             appro_rej_reason
+         ) values (
+         
+         	#{loginID},
+             CASE
+                  WHEN #{fileexist} = 'N' THEN 0
+                  WHEN #{fileexist} = 'Y' THEN (SELECT IFNULL(MAX(file_no), 0) FROM tb_file)
+                  ELSE NULL
+             END,
+            #{no},
+            #{appro_type_cd}, 
+            #{appro_req_date},
+            #{dept_cd},
+            #{expen_price},
+            'N',
+            #{appro_rej_reason}
+         )      
+	</insert>
+	<insert id="fileinsert">
+	    <selectKey resultType="int" keyProperty="no" order="BEFORE">
+            select ifnull(max(file_no),0) + 1 from tb_file
+        </selectKey>  
+	    insert into tb_file
+	         (
+	             file_no
+               , file_name
+               , logic_path
+               , physic_path
+               , file_size
+               , exten
+	         ) values (
+	            #{no}
+	           ,#{filereturn.file_nm}   
+	           ,#{filereturn.vrfile_loc}   
+	           ,#{filereturn.file_loc}   
+	           ,#{filereturn.file_size}   
+	           ,#{filereturn.fileExtension}  
+	         )
+	</insert>
+	
+	
+	<update id="listUpdatefileAppro">
+	      update tb_appro
+	    
+	         set  appro_type_cd =  #{appro_type_cd} 
+             		,appro_req_date =  #{appro_req_date} 
+             		,dept_cd =  #{dept_cd} 
+             		,appro_price =  #{expen_price} 
+             		,appro_rej_reason =  #{appro_rej_reason} 
+                <if test="fileexist eq 'Y'.toString()">
+                , file_no = (select ifnull(max(file_no),0)  from tb_file)
+                </if>
+                <if test="fileexist eq 'N'.toString()">
+                , file_no = 0
+                </if>
+	     where  appro_no =  #{appro_no}  
+	</update>
+	
+	
+	<update id="listDelete">
+	    delete from tb_expen_report
+	    where  expen_report_no =  #{expen_report_no} 
+	</update>
+	<update id="listDeleteAppro">
+	    delete from tb_appro
+	    where  appro_no =  #{appro_no} 
+	</update>
+	
+	
+	<delete id="deletefileinfo">
+	         delete from tb_file
+             where file_no = ( 
+                                       select file_no 
+                                        from tb_appro
+                                      where appro_no = #{appro_no} 
+                                   )
+	</delete>
+	
+	
+</mapper>

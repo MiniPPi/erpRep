@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.selSaY.dao.SelSaYDao">
+
+    <!--  목록 조회 -->
+    <select id="saleYearList" resultType="kr.happyjob.study.selSaY.model.SelSaYModel">
+        SELECT
+            2023 AS sale_year,
+            350 AS total_sales_volume,
+            1950000000 AS order_year_tot_product_price,
+            900000000 AS order_year_tot_product_unit_price,
+            42000000 AS expense_total,
+            9080000000 AS year_total_profit,
+            27 AS percent_year
+        UNION ALL
+        SELECT
+            2022,
+            320,
+            1850000000,
+            880000000,
+            40500000,
+            9040000000,
+            26
+        UNION ALL
+        SELECT
+            2021,
+            300,
+            1800000000,
+            850000000,
+            39000000,
+            9000000000,
+            25
+        UNION ALL
+        SELECT
+            2020,
+            280,
+            1750000000,
+            820000000,
+            27500000,
+            8900000000,
+            24
+        UNION ALL
+        SELECT
+            2019,
+            260,
+            1700000000,
+            800000000,
+            36000000,
+            8800000000,
+            23
+    </select>
+
+    <select id="countSaleYearList" resultType="int">
+        SELECT COUNT(*)
+        FROM (
+                 SELECT
+                     YEAR(od.order_date) AS order_year,
+                     SUM(odt.order_dt_amt) AS order_year_dt_amt,
+                     SUM(od.order_tot_price) AS order_year_tot_price,
+                     SUM(pd.product_price * odt.order_dt_amt) AS order_year_tot_product_price,
+                     SUM(pd.product_unit_price * odt.order_dt_amt) AS order_year_tot_product_unit_price,
+                     SUM(pd.product_price * odt.order_dt_amt - pd.product_unit_price * odt.order_dt_amt) AS tot_profit,
+                     (
+                     SELECT SUM(sal.sal_after)
+                     FROM tb_sal sal
+                     INNER JOIN tb_userinfo user ON user.loginID = sal.loginID
+                     INNER JOIN (SELECT detail_code, detail_name FROM tb_detail_code) deptn ON deptn.detail_code = user.dept_cd
+                     INNER JOIN (SELECT detail_code, detail_name FROM tb_detail_code) leveln ON leveln.detail_code = user.level_cd
+                     WHERE substr(sal.sal_date, 1, 4) = YEAR(od.order_date)
+                     ) AS sal_after_total
+                 FROM tb_order od
+                     INNER JOIN tb_order_dt odt ON od.order_no = odt.order_no
+                     INNER JOIN tb_product pd ON odt.product_no = pd.product_no
+                 GROUP BY YEAR(od.order_date)
+                 ORDER BY order_year DESC
+             ) AS subquery
+    </select>
+
+</mapper>

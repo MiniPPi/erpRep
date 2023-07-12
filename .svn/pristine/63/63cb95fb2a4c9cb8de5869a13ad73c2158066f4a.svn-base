@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.empApm.dao.EmpApmDao">
+
+	<!-- 목록 조회 -->
+	<select id="approManagementList" resultType="kr.happyjob.study.empApm.model.EmpApmModel">
+		<!-- kr.happyjob.study.empApm.dao.EmpApmDao.approManagementList -->
+		SELECT *
+		FROM (
+		SELECT
+		'휴가' AS type,
+		vr.appro_no AS appro_no,
+		vr.appro_type_cd,
+		vr.vaca_no AS no,
+		dc.detail_name AS dept_name,
+		vr.loginID AS loginID,
+		ui.name AS name,
+		DATE_FORMAT(vr.vaca_req_date,
+		'%Y-%m-%d') AS reqdate,
+		CONCAT(
+		DATE_FORMAT(vr.vaca_req_date, '%Y'),
+		'년',
+		DATE_FORMAT(vr.vaca_req_date, '%m'), '월',
+		DATE_FORMAT(vr.vaca_req_date, '%d'), '일'
+		) AS req_date,
+		ap.appro_yn AS appro_yn,
+		DATE_FORMAT(ap.appro_date, '%Y-%m-%d') AS approdate,
+		CONCAT(
+		DATE_FORMAT(ap.appro_date, '%Y'), '년',
+		DATE_FORMAT(ap.appro_date,'%m'), '월',
+		DATE_FORMAT(ap.appro_date, '%d'), '일'
+		) AS appro_date,
+		ap.appro_bos AS appro_bos
+		FROM tb_vaca_req vr
+		INNER JOIN tb_userinfo ui
+		ON ui.loginID = vr.loginID
+		INNER JOIN tb_detail_code dc ON ui.dept_cd = dc.detail_code
+		INNER JOIN tb_appro ap ON ap.appro_no = vr.appro_no
+
+		UNION
+
+		SELECT
+		'발주' AS type,
+		dl.appro_no AS appro_no,
+		dl.appro_type_cd,
+		dl.dlv_no AS no,
+		dc.detail_name AS dept_name,
+		dl.loginID AS loginID,
+		ui.name AS name,
+		DATE_FORMAT(dl.dlv_date, '%Y-%m-%d') AS reqdate,
+		CONCAT(
+		DATE_FORMAT(dl.dlv_date, '%Y'), '년',
+		DATE_FORMAT(dl.dlv_date,
+		'%m'), '월',
+		DATE_FORMAT(dl.dlv_date, '%d'), '일'
+		) AS req_date,
+		ap.appro_yn AS appro_yn,
+		DATE_FORMAT(ap.appro_date, '%Y-%m-%d') AS approdate,
+		CONCAT(
+		DATE_FORMAT(ap.appro_date, '%Y'), '년',
+		DATE_FORMAT(ap.appro_date, '%m'), '월',
+		DATE_FORMAT(ap.appro_date,
+		'%d'), '일'
+		) AS appro_date,
+		ap.appro_bos AS appro_bos
+		FROM tb_dlv dl
+		INNER JOIN tb_userinfo ui ON ui.loginID = dl.loginID
+		INNER JOIN
+		tb_detail_code dc ON ui.dept_cd = dc.detail_code
+		INNER JOIN tb_appro ap
+		ON ap.appro_no = dl.appro_no
+		) AS appro
+		<where>
+			<if test="(from != null) and (!from.equals(''))">
+				AND appro.req_date <![CDATA[>=]]>
+				STR_TO_DATE(#{from}, '%Y-%m-%d')
+			</if>
+
+			<if test="(to != null) and (!to.equals(''))">
+				AND appro.req_date <![CDATA[<=]]>
+				STR_TO_DATE(#{to}, '%Y-%m-%d')
+			</if>
+
+			<if test="(appro_yn != null) and (!appro_yn.equals(''))">
+				AND appro.appro_yn = #{appro_yn}
+			</if>
+
+			<if test="(appro_type_cd != null) and (!appro_type_cd.equals(''))">
+				AND appro.appro_type_cd = #{appro_type_cd}
+			</if>
+
+			<if test="(sname != null) and (!sname.equals(''))">
+				AND appro.name LIKE CONCAT('%', #{sname}, '%')
+			</if>
+		</where>
+		ORDER BY appro.appro_no DESC
+		LIMIT #{pageindex}, #{pageSize}
+	</select>
+
+
+
+	<!-- 목록 총 갯수 조회 -->
+	<select id="countList" resultType="int">
+		/*kr.happyjob.study.empApm.dao.EmpApmDao.countList*/
+
+		SELECT COUNT(*)
+		FROM (
+		SELECT
+		'휴가' AS type,
+		vr.appro_no AS appro_no,
+		vr.appro_type_cd,
+		vr.vaca_no AS no,
+		dc.detail_name AS dept_name,
+		vr.loginID AS loginID,
+		ui.name AS name,
+		DATE_FORMAT(vr.vaca_req_date,
+		'%Y-%m-%d') AS reqdate,
+		CONCAT(
+		DATE_FORMAT(vr.vaca_req_date, '%Y'),
+		'년',
+		DATE_FORMAT(vr.vaca_req_date, '%m'), '월',
+		DATE_FORMAT(vr.vaca_req_date, '%d'), '일'
+		) AS req_date,
+		ap.appro_yn AS appro_yn,
+		DATE_FORMAT(ap.appro_date, '%Y-%m-%d') AS approdate,
+		CONCAT(
+		DATE_FORMAT(ap.appro_date, '%Y'), '년',
+		DATE_FORMAT(ap.appro_date,'%m'), '월',
+		DATE_FORMAT(ap.appro_date, '%d'), '일'
+		) AS appro_date,
+		ap.appro_bos AS appro_bos
+		FROM tb_vaca_req vr
+		INNER JOIN tb_userinfo ui
+		ON ui.loginID = vr.loginID
+		INNER JOIN tb_detail_code dc ON ui.dept_cd =
+		dc.detail_code
+		INNER JOIN tb_appro ap ON ap.appro_no = vr.appro_no
+
+		UNION
+
+		SELECT
+		'발주' AS type,
+		dl.appro_no AS appro_no,
+		dl.appro_type_cd,
+		dl.dlv_no AS no,
+		dc.detail_name AS dept_name,
+		dl.loginID AS loginID,
+		ui.name AS name,
+		DATE_FORMAT(dl.dlv_date, '%Y-%m-%d') AS reqdate,
+		CONCAT(
+		DATE_FORMAT(dl.dlv_date, '%Y'), '년',
+		DATE_FORMAT(dl.dlv_date,
+		'%m'), '월',
+		DATE_FORMAT(dl.dlv_date, '%d'), '일'
+		) AS req_date,
+		ap.appro_yn AS appro_yn,
+		DATE_FORMAT(ap.appro_date, '%Y-%m-%d') AS approdate,
+		CONCAT(
+		DATE_FORMAT(ap.appro_date, '%Y'), '년',
+		DATE_FORMAT(ap.appro_date, '%m'), '월',
+		DATE_FORMAT(ap.appro_date,
+		'%d'), '일'
+		) AS appro_date,
+		ap.appro_bos AS appro_bos
+		FROM tb_dlv dl
+		INNER JOIN tb_userinfo ui ON ui.loginID = dl.loginID
+		INNER JOIN
+		tb_detail_code dc ON ui.dept_cd = dc.detail_code
+		INNER JOIN tb_appro ap
+		ON ap.appro_no = dl.appro_no
+		) AS appro
+				<where>
+			<if test="(from != null) and (!from.equals(''))">
+				AND appro.reqdate <![CDATA[>=]]>
+				STR_TO_DATE(#{from}, '%Y-%m-%d')
+			</if>
+
+			<if test="(to != null) and (!to.equals(''))">
+				AND appro.reqdate <![CDATA[<=]]>
+				STR_TO_DATE(#{to}, '%Y-%m-%d')
+			</if>
+
+			<if test="(appro_yn != null) and (!appro_yn.equals(''))">
+				AND appro.appro_yn = #{appro_yn}
+			</if>
+
+			<if test="(acnt_sbject_cd != null) and (!acnt_sbject_cd.equals(''))">
+				AND appro.appro_type_cd = #{appro_type_cd}
+			</if>
+
+			<if test="(sname != null) and (!sname.equals(''))">
+				AND appro.name LIKE CONCAT('%', #{sname}, '%')
+			</if>
+		</where>
+	</select>
+
+
+
+
+	<select id="listSelectOneApm" resultType="kr.happyjob.study.empApm.model.EmpApmModel">
+	SELECT dlv.dlv_no
+		,dlv.loginID
+		,ui.name
+		,sp.splr_name
+		,pd.product_name
+
+		,dlv.product_no
+		,dlv.dlv_rej
+		,dlv.splr_no
+
+		,dlv.dlv_amt
+
+		,dlv.dlv_date
+		,ap.appro_no
+		,ap.appro_bos
+		,ap.appro_rej_reason
+		,pd.product_unit_price
+
+		,sb.acnt_sbject_name
+		,ds.acnt_dt_sbjct_name
+		,FORMAT(CAST(pd.product_unit_price * dlv.dlv_amt AS DECIMAL), 0) AS
+		expen_price
+		FROM tb_dlv dlv
+		INNER JOIN tb_product pd ON pd.product_no =
+		dlv.product_no
+		INNER JOIN tb_splr sp ON sp.splr_no = dlv.splr_no
+		INNER
+		JOIN tb_appro ap ON ap.appro_no = dlv.appro_no
+		INNER JOIN
+		tb_acnt_sbject sb ON sb.acnt_sbject_cd = dlv.acnt_sbject_cd
+		INNER JOIN
+		tb_dt_sbject ds ON ds.acnt_dt_sbject_cd =dlv.acnt_dt_sbject_cd
+		INNER
+		JOIN tb_userinfo ui ON ui.loginID = dlv.loginID
+		where dlv.appro_no
+		=#{appro_no}
+
+	</select>
+
+
+	<!-- 결재 상태 업데이트 -->
+	<update id="updateApmStatus" parameterType="java.util.Map">
+		UPDATE tb_appro ap
+		INNER JOIN tb_userinfo ui ON ap.loginID = ui.loginID
+		SET ap.appro_yn = #{appro_yn},
+		ap.appro_date = DATE(NOW()),
+		ap.appro_bos = #{loginID},
+		ap.appro_rej_reason = #{appro_rej_reason}
+		WHERE appro_no = #{appro_no};
+	</update>
+
+
+<!-- 휴가 상태 조회 -->
+
+
+<select resultType="kr.happyjob.study.empApm.model.EmpApmModel" id="getVacationStatus">
+    SELECT 
+    vaca.vaca_no,
+    vaca.loginID,
+    ui.name,
+    ui.dept_cd, -- 부서코드 추가
+    vaca.vaca_req_date,
+    ap.appro_no,
+    ap.appro_bos,
+    CONCAT(
+        DATE_FORMAT(vaca.vaca_edate, '%Y년 %m월 %d일')
+    ) AS vaca_edate,
+    CONCAT(
+        DATE_FORMAT(vaca.vaca_sdate, '%Y년 %m월 %d일')
+    ) AS vaca_sdate
+FROM
+    tb_vaca_req vaca
+        INNER JOIN
+    tb_appro ap ON ap.appro_no = vaca.appro_no
+        INNER JOIN
+    tb_userinfo ui ON ui.loginID = vaca.loginID
+        INNER JOIN
+    tb_userinfo ui_dept ON ui_dept.loginID = vaca.loginID -- 부서명을 가져오기 위한 조인
+    WHERE vaca.appro_no = #{appro_no}
+</select>
+		
+<insert id="listUpdateFileBudApm">
+	<selectKey resultType="int" order="BEFORE" keyProperty="no">SELECT IFNULL(max(budget_no),0) + 1 from tb_budget; </selectKey>
+
+		insert into tb_budget(
+			budget_no,
+		 	acnt_sbject_cd,
+		 	acnt_dt_sbject_cd,
+		 	dlv_no
+		 	)
+	 	values(
+			 #{no},
+			 #{acnt_sbject_cd},
+			 #{acnt_dt_sbject_cd},
+			 #{dlv_no}
+			 <!-- jsp발주번호 파람값으로넘기기 -->
+		 ) 
+	</insert>
+	<select id = "dveSelecte" resultType="string">
+		
+	            select appro_type_cd from tb_appro where appro_no = ${appro_no}
+	  
+	</select>
+	<!-- 발주, 휴가 업데이트 -->
+<update id="DVEupdate">
+
+   <if test='appro_type_cd == "D"'>
+	   	<if test='appro_yn == "Y"'>
+	        update tb_dlv set appro_yn = 'Y'  where appro_no = #{appro_no}
+	      </if>
+	      <if test='appro_yn == "N"'>
+	        update tb_dlv set dlv_rej = #{appro_rej_reason} where appro_no = #{appro_no}
+	      </if>
+    </if>
+    <if test='appro_type_cd == "V"'>
+    	<if test='appro_yn == "Y"'>
+	        update tb_vaca_req set appro_yn = 'Y' where appro_no = #{appro_no}
+	      </if>
+	      <if test='appro_yn == "N"'>
+	        update tb_vaca_req set vaca_rej = #{appro_rej_reason} where appro_no = #{appro_no}
+	      </if>
+        
+    </if>
+</update>
+
+<!-- 휴가잔여 계산 -->
+<!-- 결재한 휴가일수계산 -->
+<select id="vacaDays" resultType = "int">
+	select  DATEDIFF(STR_TO_DATE(vaca_edate, '%Y-%m-%d'),STR_TO_DATE(vaca_sdate, '%Y-%m-%d')) 
+	from tb_vaca_req where appro_no = #{appro_no}
+</select>
+
+<!-- 휴가잔여테이블에 휴가일수 빼기 -->
+<update id="vacaUpdate">
+
+   update tb_dt_vacation set
+	dt_vaca_rest = dt_vaca_rest-#{days}+1
+    where loginID = #{loginID}
+    
+   <!--이코드는 걍 오류남 근데 받는게 어프로노 아님?
+	select  
+	dv.dt_vaca_rest-#{days} as days
+	from tb_dt_vacation dv
+	inner join tb_userinfo ui ON ui.loginID = dv.loginID
+	where dv.loginID = #{loginID} 
+	-->
+</update>
+
+</mapper>

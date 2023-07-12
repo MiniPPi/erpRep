@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.empVcp.dao.EmpVcpDao">
+	
+	<!-- 휴가신청(개인) 목록 리스트 조회 -->
+	<select id="empVcpList" resultType="kr.happyjob.study.empVcp.model.VacaPersonalModel">
+		select vaca.vaca_no
+			   ,vaca.loginID
+			   ,user.name
+			   ,vaca.vaca_req_date
+			   ,vaca.vaca_sdate
+			   ,vaca.vaca_edate
+			   ,vaca.vaca_tel
+			   ,vaca.appro_bos
+			   ,vaca.appro_yn
+			   ,vaca.vaca_rej
+			from tb_vaca_req vaca
+				 inner join tb_userinfo user on user.loginID = vaca.loginID 
+				where vaca.loginID = #{loginID}
+				order by vaca.vaca_no desc
+				LIMIT #{pageindex}, #{pageSize} 
+	
+	</select>
+	
+	<select id="countEmpVcpList" resultType="int">
+		select count(*)
+			from tb_vaca_req vaca
+				inner join tb_userinfo user on user.loginID = vaca.loginID 
+			where vaca.loginID = #{loginID}			
+	</select>
+
+<!-- 휴가신청 -->
+	<!-- 휴가테이블에 insert -->
+	<insert id="vacaApplication">
+		<selectKey resultType="int" keyProperty="vaca_no" order="BEFORE">
+            select ifnull(max(vaca_no),0) + 1 from tb_vaca_req
+        </selectKey> 
+        
+		insert into tb_vaca_req
+			(
+				vaca_no
+				,loginID
+				,vaca_tel
+				,vaca_sdate
+				,vaca_edate
+				,vaca_reason
+				,vaca_req_date
+			) values (
+				#{vaca_no}
+				,replace(#{form_loginID},' ','')
+				,replace(#{form_vaca_tel},' ','')
+				,#{form_vaca_sdate}
+				,#{form_vaca_edate}
+				,#{form_vaca_reson}
+				,DATE_FORMAT(now(),'%Y-%m-%d')
+			)
+	</insert>
+	
+	<!-- 결재테이블에 insert -->
+	<insert id="approIn">
+		<selectKey resultType="int" keyProperty="appro_no" order="BEFORE">
+            select ifnull(max(appro_no),0)+1 from tb_appro 
+        </selectKey> 
+		insert into tb_appro
+			(
+				 appro_no
+				,loginID
+				,appro_type_cd
+				,vaca_no
+				,appro_req_date
+				,dept_cd
+			) values (
+				 #{appro_no}
+				,#{form_loginID}
+				,#{appro_type_cd}
+				,(select MAX(vaca_no) from tb_vaca_req)
+				,(select vaca_req_date from tb_vaca_req where vaca_no = (select MAX(vaca_no) from tb_vaca_req))
+				,(select dept_cd from tb_userinfo where loginID = replace(#{form_loginID},' ',''))
+			)
+					
+	</insert>
+	
+	<!-- 결재테이블에 insert된 결재번호 휴가 테이블에 update -->
+	<update id="vacaApproUpdate">
+		update tb_vaca_req set appro_no = (select appro_no from tb_appro where vaca_no = (select vaca_no from (select MAX(vaca_no) as vaca_no from tb_vaca_req) vaca))
+		 where vaca_no = (select vaca_no from (select MAX(vaca_no) as vaca_no from tb_vaca_req) vaca)
+	</update>
+<!-- 휴가신청끝 -->
+	
+	
+	<!-- 반려사유 상세조회 -->
+	<select id="rejDetail" resultType="String">
+		select vaca_rej from tb_vaca_req where vaca_no = replace(#{vaca_no},' ','')
+	</select>
+	
+	<!-- 잔여연차조회 -->
+	<select id="vacaRemain" resultType="kr.happyjob.study.empVcp.model.VacaPersonalRemainModel">
+		select dt_vaca_rest, dt_va_tot from tb_dt_vacation where loginID = replace(#{loginID},' ','')
+	</select>
+	
+	
+</mapper>
