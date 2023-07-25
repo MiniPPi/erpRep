@@ -122,7 +122,7 @@ align-items:center;
 		pagenum = pagenum || 1;
 		
 		var param = {
-		   sname : $("#sname").val()
+		    sname : $("#sname").val()
 		  , pageSize : pageSize
 		  , pageBlockSize : pageBlockSize
 		  , pagenum : pagenum
@@ -235,8 +235,8 @@ align-items:center;
 					inserthtml += "";
 				} else {
 					var selfile = object.file_name;
-				    var selfilearr = selfile.split(".");
-				    var lastindex = selfilearr.length - 1;
+				        var selfilearr = selfile.split(".");
+				        var lastindex = selfilearr.length - 1;
 				    if(selfilearr[lastindex].toLowerCase() == "jpg" || selfilearr[lastindex].toLowerCase() == "gif" || selfilearr[lastindex].toLowerCase() == "jpeg" || selfilearr[lastindex].toLowerCase() == "png") {
 				    	  inserthtml += "<img src='" + object.logic_path + "' style='width:100px; height:120px' />";
 				    } else {
@@ -265,9 +265,9 @@ align-items:center;
 				,password : $("#password").val()
 				,emp_hp : $("#emp_hp").val()
 				,emp_email : $("#emp_email").val()
-			    ,emp_zip : $("#emp_zip").val()
-			    ,emp_addr : $("#emp_addr").val()
-			    ,emp_dt_addr : $("#emp_dt_addr").val()
+			        ,emp_zip : $("#emp_zip").val()
+			        ,emp_addr : $("#emp_addr").val()
+			        ,emp_dt_addr : $("#emp_dt_addr").val()
 				,action :  $("#action").val()
 		 }
 		 
@@ -322,8 +322,7 @@ align-items:center;
 		<div id="container">
 			<ul>
 				<li class="lnb">
-					<!-- lnb 영역 --> <jsp:include
-						page="/WEB-INF/view/common/lnbMenu.jsp"></jsp:include> <!--// lnb 영역 -->
+					<!-- lnb 영역 --> <jsp:include page="/WEB-INF/view/common/lnbMenu.jsp"></jsp:include> <!--// lnb 영역 -->
 				</li>
 				<li class="contents">
 					<!-- contents -->
@@ -331,9 +330,8 @@ align-items:center;
 					<div class="content">
 
 						<p class="Location">
-							<a href="../dashboard/dashboard.do" class="btn_set home">메인으로</a> <span
-								class="btn_nav bold">인사</span> <span class="btn_nav bold">마이페이지
-								</span> <a href="../empMpg/empMypage.do" class="btn_set refresh">새로고침</a>
+							<a href="../dashboard/dashboard.do" class="btn_set home">메인으로</a> <span class="btn_nav bold">인사</span> <span class="btn_nav bold">마이페이지
+							</span> <a href="../empMpg/empMypage.do" class="btn_set refresh">새로고침</a>
 						</p>
 
 						<p class="conTitle">
@@ -461,7 +459,7 @@ align-items:center;
 				<div class="btn_areaC mt30">
 					<a href="" class="btnType blue" id="btnSaveFile" name="btn"><span>수정</span></a>
     				<a href="" class="btnType blue" id="btnDeleteFile" name="btn"><span>삭제</span></a> 
-					<a href=""	class="btnType gray"  id="btnCloseFile" name="btn"><span>취소</span></a>
+					<a href="" class="btnType gray"  id="btnCloseFile" name="btn"><span>취소</span></a>
 				</div>
 			</dd>
 		</dl>
