@@ -156,30 +156,7 @@ public class AccEpsController {
       return returnmap;
    }  
    
-	@RequestMapping("downloadListFileEps.do")
-	public void downloadListFileEps(Model model, @RequestParam Map<String, Object> paramMap, HttpServletRequest request,
-			HttpServletResponse response, HttpSession session) throws Exception {
 	
-		logger.info("+ Start " + className + ".downloadListFileEps");
-		logger.info("   - paramMap : " + paramMap);
-		
-		
-		AccEpsModel listSearch = accEpsService.listSelectOneEps(paramMap);  
-		
-		byte fileByte[] = FileUtils.readFileToByteArray(new File(listSearch.getPhysic_path()));
-		
-		response.setContentType("application/octet-stream");
-	        response.setContentLength(fileByte.length);
-	        response.setHeader("Content-Disposition", "attachment; fileName=\"" + URLEncoder.encode(listSearch.getFile_name(),"UTF-8")+"\";");
-	        response.setHeader("Content-Transfer-Encoding", "binary");
-	        response.getOutputStream().write(fileByte);
-	     
-	        response.getOutputStream().flush();
-	        response.getOutputStream().close();
-
-		logger.info("+ End " + className + ".downloadListFileEps");
-	}
-	   
 	   
       
 }
