@@ -111,9 +111,6 @@ public class AccEpsController {
       logger.info("   - paramMap : " + paramMap);
       
       String action = (String) paramMap.get("action");
-//      int expen_price = Integer.parseInt((String) paramMap.get("expen_price"));
-//      
-//      paramMap.put("expen_price", expen_price);
       paramMap.put("loginID", (String) session.getAttribute("loginID"));
       
       
@@ -166,19 +163,19 @@ public class AccEpsController {
 		logger.info("+ Start " + className + ".downloadListFileEps");
 		logger.info("   - paramMap : " + paramMap);
 		
-		// 첨부파일 조회
-		AccEpsModel listSearch = accEpsService.listSelectOneEps(paramMap);  // file 이름    , 물리경로
+		
+		AccEpsModel listSearch = accEpsService.listSelectOneEps(paramMap);  
 		
 		byte fileByte[] = FileUtils.readFileToByteArray(new File(listSearch.getPhysic_path()));
 		
 		response.setContentType("application/octet-stream");
-	    response.setContentLength(fileByte.length);
-	    response.setHeader("Content-Disposition", "attachment; fileName=\"" + URLEncoder.encode(listSearch.getFile_name(),"UTF-8")+"\";");
-	    response.setHeader("Content-Transfer-Encoding", "binary");
-	    response.getOutputStream().write(fileByte);
+	        response.setContentLength(fileByte.length);
+	        response.setHeader("Content-Disposition", "attachment; fileName=\"" + URLEncoder.encode(listSearch.getFile_name(),"UTF-8")+"\";");
+	        response.setHeader("Content-Transfer-Encoding", "binary");
+	        response.getOutputStream().write(fileByte);
 	     
-	    response.getOutputStream().flush();
-	    response.getOutputStream().close();
+	        response.getOutputStream().flush();
+	        response.getOutputStream().close();
 
 		logger.info("+ End " + className + ".downloadListFileEps");
 	}
