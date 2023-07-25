@@ -179,9 +179,9 @@ width: 650px;
 		   from: $("#from").val()
 		   ,to: $("#to").val()
 		  , appro_yn : $("#appro_yn").val()
-		  ,	acnt_sbject_cd : $("#search_acnt_sbject_cd").val()
-		  ,	acnt_dt_sbject_cd : $("#search_acnt_dt_sbject_cd").val()
-		  , 	sname : $("#sname").val()
+		  , acnt_sbject_cd : $("#search_acnt_sbject_cd").val()
+		  , acnt_dt_sbject_cd : $("#search_acnt_dt_sbject_cd").val()
+		  , sname : $("#sname").val()
 		  , pageSize : pageSize
 		  , pageBlockSize : pageBlockSize
 		  , pagenum : pagenum
@@ -214,7 +214,7 @@ width: 650px;
 		
 		
 		var param = {
-				appro_no : no
+			appro_no : no
 		}
 		
 		var selectonecallback = function(returndata) {			
@@ -236,7 +236,7 @@ width: 650px;
 
 		var chk = checkNotEmpty(
 				[
-						[ "appro_type_cd", "결재유형을 선택해주세요." ]
+					    [ "appro_type_cd", "결재유형을 선택해주세요." ]
 					   ,[ "dept_cd", "부서를 선택해주세요." ]
 					   ,[ "acnt_sbject_cd", "계정대분류를 선택해주세요." ]
 					   ,[ "acnt_dt_sbject_cd", "계정상세를 선택해주세요" ]
@@ -416,9 +416,9 @@ width: 650px;
 		//alert(image.files[0].file_name + " : " + image.files[0].file_nm + " : " + image.files[0].name);
 		
 		 if(image.files[0]){
-			  //alert(window.URL.createObjectURL(image.files[0]));
+		     //alert(window.URL.createObjectURL(image.files[0]));
 			 
-			  var selfile = image.files[0].name;
+		      var selfile = image.files[0].name;
 		      var selfilearr = selfile.split(".");
 		      var inserthtml = "";
 		      var lastindex = selfilearr.length - 1;
@@ -509,8 +509,7 @@ width: 650px;
 		<div id="container">
 			<ul>
 				<li class="lnb">
-					<!-- lnb 영역 --> <jsp:include
-						page="/WEB-INF/view/common/lnbMenu.jsp"></jsp:include> <!--// lnb 영역 -->
+					<!-- lnb 영역 --> <jsp:include page="/WEB-INF/view/common/lnbMenu.jsp"></jsp:include> <!--// lnb 영역 -->
 				</li>
 				<li class="contents">
 					<!-- contents -->
@@ -518,9 +517,8 @@ width: 650px;
 					<div class="content">
 
 						<p class="Location">
-							<a href="../dashboard/dashboard.do" class="btn_set home">메인으로</a> <span
-								class="btn_nav bold">회계</span> <span class="btn_nav bold">지출결의서 신청
-								</span> <a href="../accEpr/expenseRequire.do" class="btn_set refresh">새로고침</a>
+							<a href="../dashboard/dashboard.do" class="btn_set home">메인으로</a> <span class="btn_nav bold">회계</span> <span class="btn_nav bold">지출결의서 신청
+							</span> <a href="../accEpr/expenseRequire.do" class="btn_set refresh">새로고침</a>
 						</p>
 
 						<p class="conTitle">
@@ -700,7 +698,7 @@ width: 650px;
 					<c:if test="${sessionScope.userType == 'A' || sessionScope.userType == 'C'}">
     					<a href="" class="btnType blue" id="btnDeleteFile" name="btn"><span>삭제</span></a> 
 					</c:if>
-					<a href=""	class="btnType gray"  id="btnCloseFile" name="btn"><span>취소</span></a>
+					<a href="" class="btnType gray"  id="btnCloseFile" name="btn"><span>취소</span></a>
 				</div>
 			</dd>
 		</dl>
