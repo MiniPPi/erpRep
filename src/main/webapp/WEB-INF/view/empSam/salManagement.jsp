@@ -228,8 +228,14 @@
 					calDate : $("#calDate").val()
 			}
 			var calSalCallback = function(reval) {
-				//리스트 다시 뿌려주기
-				fn_empSamList();
+				
+				if(reval.reval>0) {
+					//리스트 다시 뿌려주기
+					fn_empSamList();
+				}else {
+					alert("급여계산 실패");
+				}
+				
 			}
 			callAjax("/empSam/calSal.do", "post", "json", false, param, calSalCallback) ;
 			
