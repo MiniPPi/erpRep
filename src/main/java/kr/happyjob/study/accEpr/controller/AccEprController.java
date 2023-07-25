@@ -154,19 +154,19 @@ public class AccEprController {
 		logger.info("+ Start " + className + ".downloadListFile");
 		logger.info("   - paramMap : " + paramMap);
 		
-		// 첨부파일 조회
-		AccEprModel listSearch = accEprService.listSelectOne(paramMap);  // file 이름    , 물리경로
+		
+		AccEprModel listSearch = accEprService.listSelectOne(paramMap);  
 		
 		byte fileByte[] = FileUtils.readFileToByteArray(new File(listSearch.getPhysic_path()));
 		
 		response.setContentType("application/octet-stream");
-	    response.setContentLength(fileByte.length);
-	    response.setHeader("Content-Disposition", "attachment; fileName=\"" + URLEncoder.encode(listSearch.getFile_name(),"UTF-8")+"\";");
-	    response.setHeader("Content-Transfer-Encoding", "binary");
-	    response.getOutputStream().write(fileByte);
+	        response.setContentLength(fileByte.length);
+	        response.setHeader("Content-Disposition", "attachment; fileName=\"" + URLEncoder.encode(listSearch.getFile_name(),"UTF-8")+"\";");
+	        response.setHeader("Content-Transfer-Encoding", "binary");
+	        response.getOutputStream().write(fileByte);
 	     
-	    response.getOutputStream().flush();
-	    response.getOutputStream().close();
+	        response.getOutputStream().flush();
+	        response.getOutputStream().close();
 
 		logger.info("+ End " + className + ".downloadListFile");
 	}
