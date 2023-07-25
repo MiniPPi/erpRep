@@ -185,9 +185,9 @@ color:black;
 		   from: $("#from").val()
 		   ,to: $("#to").val()
 		  , appro_yn : $("#search_appro_yn").val()
-		  ,	acnt_sbject_cd : $("#search_acnt_sbject_cd").val()
-		  ,	acnt_dt_sbject_cd : $("#search_acnt_dt_sbject_cd").val()
-		  , 	sname : $("#sname").val()
+		  , acnt_sbject_cd : $("#search_acnt_sbject_cd").val()
+		  , acnt_dt_sbject_cd : $("#search_acnt_dt_sbject_cd").val()
+		  , sname : $("#sname").val()
 		  , pageSize : pageSize
 		  , pageBlockSize : pageBlockSize
 		  , pagenum : pagenum
@@ -246,7 +246,7 @@ color:black;
 
 		var chk = checkNotEmpty(
 				[
-						[ "appro_type_cd", "결재유형을 선택해주세요." ]
+					    [ "appro_type_cd", "결재유형을 선택해주세요." ]
 					   ,[ "dept_cd", "부서를 선택해주세요." ]
 					   ,[ "acnt_sbject_cd", "계정대분류를 선택해주세요." ]
 					   ,[ "acnt_dt_sbject_cd", "계정상세를 선택해주세요" ]
@@ -358,7 +358,7 @@ color:black;
 		 if(image.files[0]){
 			 
 			 
-			  var selfile = image.files[0].name;
+		      var selfile = image.files[0].name;
 		      var selfilearr = selfile.split(".");
 		      var inserthtml = "";
 		      var lastindex = selfilearr.length - 1;
@@ -430,8 +430,8 @@ color:black;
 				,appro_rej_reason : $("#appro_rej_reason").val()
 				,budget_no : $("#budget_no").val()
 				,acnt_sbject_cd : $("#acnt_sbject_cd").val()
-			    ,acnt_dt_sbject_cd : $("#acnt_dt_sbject_cd").val()
-			    ,expen_report_no : $("#expen_report_no").val()
+			        ,acnt_dt_sbject_cd : $("#acnt_dt_sbject_cd").val()
+			        ,expen_report_no : $("#expen_report_no").val()
 				,action :  $("#action").val()
 		 }
 		 
@@ -505,8 +505,7 @@ color:black;
 		<div id="container">
 			<ul>
 				<li class="lnb">
-					<!-- lnb 영역 --> <jsp:include
-						page="/WEB-INF/view/common/lnbMenu.jsp"></jsp:include> <!--// lnb 영역 -->
+					<!-- lnb 영역 --> <jsp:include page="/WEB-INF/view/common/lnbMenu.jsp"></jsp:include> <!--// lnb 영역 -->
 				</li>
 				<li class="contents">
 					<!-- contents -->
@@ -514,9 +513,8 @@ color:black;
 					<div class="content">
 
 						<p class="Location">
-							<a href="../dashboard/dashboard.do" class="btn_set home">메인으로</a> <span
-								class="btn_nav bold">회계</span> <span class="btn_nav bold">지출결의서 조회 및 승인
-								</span> <a href="../accEps/expenseSearch.do" class="btn_set refresh">새로고침</a>
+							<a href="../dashboard/dashboard.do" class="btn_set home">메인으로</a> <span class="btn_nav bold">회계</span> <span class="btn_nav bold">지출결의서 조회 및 승인
+							</span> <a href="../accEps/expenseSearch.do" class="btn_set refresh">새로고침</a>
 						</p>
 
 						<p class="conTitle">
@@ -532,17 +530,17 @@ color:black;
 									<span class="emptySpace1"></span><span class="label-font">결재&nbsp;</span>
 									<select id="search_appro_yn" name="search_appro_yn" style="width: 100px; height:27px">
 									        <option value="" >전체</option>
-											<option value="Y" >결재</option>
-											<option value="N" >반려</option>
+										<option value="Y" >결재</option>
+										<option value="N" >반려</option>
 									</select>
 									
 									<span class="label-font">&nbsp;&nbsp;&nbsp;&nbsp;계정 대분류&nbsp;</span>
-									 <select id="search_acnt_sbject_cd" name="search_acnt_sbject_cd" style="width: 100px; height:27px" >
+									  <select id="search_acnt_sbject_cd" name="search_acnt_sbject_cd" style="width: 100px; height:27px" >
 									   
 									</select>
 									
 									<span class="label-font">&nbsp;&nbsp;&nbsp;&nbsp;계정 상세&nbsp;</span>
-									 <select id="search_acnt_dt_sbject_cd" name="search_acnt_dt_sbject_cd" style="width: 100px; height:27px " >
+									  <select id="search_acnt_dt_sbject_cd" name="search_acnt_dt_sbject_cd" style="width: 100px; height:27px " >
 									</select> 
 							
 									<input type="text" style="width: 120px; height: 25px" id="sname" name="sname" class="inputSpace"> <div class="emptySpace5"></div> 
@@ -703,7 +701,7 @@ color:black;
 				<div class="btn_areaC mt30">
 					<a href="" class="btnType blue" id="btnSaveFile" name="btn"><span>저장</span></a>
     				<a href="" class="btnType blue" id="btnDeleteFile" name="btn"><span>삭제</span></a> 
-					<a href=""	class="btnType gray"  id="btnCloseFile" name="btn"><span>취소</span></a>
+					<a href="" class="btnType gray"  id="btnCloseFile" name="btn"><span>취소</span></a>
 				</div>
 			</dd>
 		</dl>
