@@ -1,7 +1,9 @@
 # ERPproject
 ERP(Enterprise Resource Planning) System - 전사적 자원 관리 시스템
-
+<hr>
 <br>
+
+<img src="https://user-images.githubusercontent.com/106902415/254894698-b55c61d4-9dcc-4739-ab80-324c6493b8d4.gif"/>
 
 ## 🖥️ 프로젝트 소개
  - 프로젝트 선정이유
