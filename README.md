@@ -32,44 +32,46 @@ ERP(Enterprise Resource Planning) System - 전사적 자원 관리 시스템
 
 ## ⚙️ 개발 환경
 - 개발환경
->Eclipse(eGovFrameDev-3.6.0)
+<img src="https://img.shields.io/badge/eclipse%20ide-%232C2255.svg?&style=for-the-badge&logo=eclipse%20ide&logoColor=white" /> (eGovFrameDev-3.6.0)
 
->My SQL(5.1.30)
+<img src="https://img.shields.io/badge/mysql-%234479A1.svg?&style=for-the-badge&logo=mysql&logoColor=white" />
 
->SpringFramework(4.3.0)
+<img src="https://img.shields.io/badge/spring-%236DB33F.svg?&style=for-the-badge&logo=spring&logoColor=white" />
 
->SVN
+<img src="https://img.shields.io/badge/svn-%233ECF8E.svg?&style=for-the-badge&logo=svn&logoColor=white" />
 
->eXERD
+<img src="https://img.shields.io/badge/exerd-%2314D8CC.svg?&style=for-the-badge&logo=exerd&logoColor=white" />
 
->apache-tomcat(8.0)
+<img src="https://img.shields.io/badge/apache%20tomcat-%23F8DC75.svg?&style=for-the-badge&logo=apache%20tomcat&logoColor=black" />
 
 - 개발언어
->JAVA(1.8.0)
+<img src="https://img.shields.io/badge/java-%23007396.svg?&style=for-the-badge&logo=java&logoColor=white" />
 
 >JSP
 
->JavaScript
+<img src="https://img.shields.io/badge/javascript-%23F7DF1E.svg?&style=for-the-badge&logo=javascript&logoColor=black" />
 
->HTML5
+<img src="https://img.shields.io/badge/html5-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" />
+  
+<img src="https://img.shields.io/badge/css3-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" />
 
->CSS3
+<img src="https://img.shields.io/badge/jquery-%230769AD.svg?&style=for-the-badge&logo=jquery&logoColor=white" />
 
->jQuery(3.4)
-
->XML
+<img src="https://img.shields.io/badge/xml-%23409FFF.svg?&style=for-the-badge&logo=xml&logoColor=white" />
 
 - 개발도구
->AJAX
+	<img src="https://img.shields.io/badge/ajax-%230067C5.svg?&style=for-the-badge&logo=ajax&logoColor=white" />
 
->MYBATIS(3.0.6)
+<img src="https://img.shields.io/badge/mybatis-%23414141.svg?&style=for-the-badge&logo=mybatis&logoColor=white" />
 
->JSON
+<img src="https://img.shields.io/badge/json-%23000000.svg?&style=for-the-badge&logo=json&logoColor=white" />
+
+<img src="https://img.shields.io/badge/jsp-%239FEF00.svg?&style=for-the-badge&logo=jsp&logoColor=black" />
   
 <br>
 
 ## 📌 주요 기능
-#### 💵회계 - <a href="" >상세보기 - WIKI 이동</a>
+#### 💵회계 
 - 계정과목관리
   1. <a href="src/main/java/kr/happyjob/study/accAcm" >java file</a>
   2. <a href="src/main/resources/sql/accAcm" >mapper file</a>
@@ -90,7 +92,7 @@ ERP(Enterprise Resource Planning) System - 전사적 자원 관리 시스템
   2. <a href="src/main/resources/sql/accAcs" >mapper file</a>
   3. <a href="src/main/webapp/WEB-INF/view/accAcs" >jsp file</a>
 
-#### 📞영업 - <a href="" >상세보기 - WIKI 이동</a>
+#### 📞영업
 - 영업계획
   1. <a href="src/main/java/kr/happyjob/study/busSap" >java file</a>
   2. <a href="src/main/resources/sql/busSap" >mapper file</a>
@@ -126,7 +128,7 @@ ERP(Enterprise Resource Planning) System - 전사적 자원 관리 시스템
   2. <a href="src/main/resources/sql/busPd" >mapper file</a>
   3. <a href="src/main/webapp/WEB-INF/view/busPd" >jsp file</a>
 
-#### 👤인사 - <a href="" >상세보기 - WIKI 이동</a>
+#### 👤인사 
 - 인사관리
   1. <a href="src/main/java/kr/happyjob/study/emp" >java file</a>
   2. <a href="src/main/resources/sql/emp" >mapper file</a>
@@ -162,7 +164,7 @@ ERP(Enterprise Resource Planning) System - 전사적 자원 관리 시스템
   2. <a href="src/main/resources/sql/empApm" >mapper file</a>
   3. <a href="src/main/webapp/WEB-INF/view/empApm" >jsp file</a>
 
-#### 📊매출 - <a href="" >상세보기 - WIKI 이동</a>
+#### 📊매출
 - 일별매출현황
   1. <a href="src/main/java/kr/happyjob/study/selSaD" >java file</a>
   2. <a href="src/main/resources/sql/selSaD" >mapper file</a>
@@ -178,13 +180,13 @@ ERP(Enterprise Resource Planning) System - 전사적 자원 관리 시스템
   2. <a href="src/main/resources/sql/selSaY" >mapper file</a>
   3. <a href="src/main/webapp/WEB-INF/view/selSaY" >jsp file</a>
 
-#### 🗓달력 - <a href="" >상세보기 - WIKI 이동</a>
+#### 🗓달력 
 - 월별결재관리
   1. <a href="src/main/java/kr/happyjob/study/calDay" >java file</a>
   2. <a href="src/main/resources/sql/calDay" >mapper file</a>
   3. <a href="src/main/webapp/WEB-INF/view/calDay" >jsp file</a>
   
-#### 🔍운영 - <a href="" >상세보기 - WIKI 이동</a> 
+#### 🔍운영 
 - 공지사항
   1. <a href="src/main/java/kr/happyjob/study/mngNot" >java file</a>
   2. <a href="src/main/resources/sql/MngNot" >mapper file</a>
